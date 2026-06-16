@@ -50,6 +50,11 @@
   .seg button{background:transparent; border:0; color:var(--dim); cursor:pointer;
     font-family:var(--sans); font-weight:600; font-size:13px; padding:7px 14px; transition:.15s}
   .seg button.on{background:var(--accent-bg); color:var(--accent)}
+  .voicesel{background:var(--surface2); border:1px solid var(--border); color:var(--text);
+    font-family:var(--sans); font-weight:600; font-size:13px; padding:7px 10px; border-radius:10px;
+    cursor:pointer; max-width:230px; outline:none}
+  .voicesel:focus{border-color:var(--accent)}
+  .voicesel option{background:var(--surface2); color:var(--text)}
   .ctl-label{font-size:12px; color:var(--faint); font-family:var(--mono);
     text-transform:uppercase; letter-spacing:.1em; margin-right:2px}
   #voiceState{font-size:12px; color:var(--faint); margin-left:auto; font-family:var(--mono)}
@@ -204,17 +209,14 @@
   </div>
 
   <div class="controls">
-    <span class="ctl-label">Акцент</span>
-    <div class="seg" id="accentSeg">
-      <button data-acc="en-US" class="on">US</button>
-      <button data-acc="en-GB">UK</button>
-    </div>
+    <span class="ctl-label">Голос</span>
+    <select id="voiceSelect" class="voicesel" aria-label="Выбор голоса"></select>
     <span class="ctl-label">Темп</span>
     <div class="seg" id="speedSeg">
       <button data-slow="0" class="on">Обычный</button>
       <button data-slow="1">Медленно</button>
     </div>
-    <span id="voiceState">проверяю голос…</span>
+    <span id="voiceState">проверяю голоса…</span>
   </div>
 
   <div class="nosound" id="nosound">
@@ -229,7 +231,7 @@
   <!-- ============ VIEW: 44 SOUNDS ============ -->
   <div class="view show" id="view-inventory">
     <div class="intro">
-      <b>Справочник всех 44 звуков</b> английского (британская модель RP — это и есть классический «набор 44 phonemes»). Нажми на любую плитку, чтобы услышать звук в слове. В примерах целевой звук <b>выделен</b>. Где американское произношение заметно отличается — есть пометка; переключи акцент сверху, чтобы услышать разницу.
+      <b>Справочник всех 44 звуков</b> английского (британская модель RP — это и есть классический «набор 44 phonemes»). Нажми на любую плитку, чтобы услышать звук в слове. В примерах целевой звук <b>выделен</b>. Где американское произношение заметно отличается — есть пометка; выбери американский или британский голос в списке сверху, чтобы услышать разницу.
       <div class="legend">
         <span class="chiplegend"><span class="dot a"></span> монофтонги</span>
         <span class="chiplegend"><span class="dot" style="background:var(--accent)"></span> дифтонги</span>
@@ -457,34 +459,51 @@ const CONTRASTS = [
 ];
 
 /* ---------------- speech ---------------- */
-let voices=[], accent='en-US', slow=false;
+let voices=[], voiceList=[], chosenVoice=null, slow=false;
 const hasTTS = 'speechSynthesis' in window;
-function loadVoices(){ if(hasTTS){ voices = speechSynthesis.getVoices(); updateVoiceState(); } }
+
+function englishVoices(){ return voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith('en')); }
+function plural(n,one,few,many){ const m=n%100, d=n%10;
+  if(m>=11&&m<=14) return many; if(d===1) return one; if(d>=2&&d<=4) return few; return many; }
+function voiceLabel(v){
+  let name=v.name.replace(/Microsoft|Google|Online|\(Natural\)|Desktop/g,'').replace(/\s+/g,' ').trim();
+  return (name||v.name)+' · '+(v.lang||'')+(v.localService?'':' ☁');
+}
+function buildVoiceList(){
+  const sel=document.getElementById('voiceSelect'); if(!sel) return;
+  const en=englishVoices();
+  voiceList = en.length ? en : voices;
+  const prevURI = chosenVoice ? chosenVoice.voiceURI : null;
+  sel.innerHTML = voiceList.map((v,i)=>`<option value="${i}">${voiceLabel(v)}</option>`).join('');
+  let idx = voiceList.findIndex(v=>v.voiceURI===prevURI);
+  if(idx<0) idx = voiceList.findIndex(v=>/en[-_]US/i.test(v.lang));
+  if(idx<0) idx = voiceList.length ? 0 : -1;
+  chosenVoice = idx>=0 ? voiceList[idx] : null;
+  if(idx>=0) sel.value=String(idx);
+  updateVoiceState();
+}
+function loadVoices(){ if(hasTTS){ voices = speechSynthesis.getVoices(); buildVoiceList(); } }
 if(hasTTS){ loadVoices(); if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoices; }
 else { document.getElementById('nosound').style.display='block'; document.getElementById('voiceState').textContent='нет синтеза речи'; document.getElementById('voiceState').classList.add('bad'); }
 
-function pickVoice(){
-  if(!voices.length) return null;
-  let v = voices.find(x=>x.lang && x.lang.replace('_','-')===accent);
-  if(!v) v = voices.find(x=>x.lang && x.lang.replace('_','-').startsWith(accent.slice(0,2)) && x.lang.replace('_','-').includes(accent.slice(3)));
-  if(!v) v = voices.find(x=>x.lang && x.lang.toLowerCase().startsWith('en'));
-  return v||null;
-}
 function updateVoiceState(){
   const el=document.getElementById('voiceState'); if(!hasTTS) return;
-  const v=pickVoice();
-  if(v){ el.textContent='🔊 '+(v.name.length>22?v.name.slice(0,22)+'…':v.name); el.classList.remove('bad'); }
-  else { el.textContent='голос не найден'; }
+  const n=englishVoices().length;
+  if(n>0){ el.textContent='🔊 '+n+' '+plural(n,'голос','голоса','голосов'); el.classList.remove('bad'); }
+  else if(voices.length){ el.textContent='нет англ. голосов — выбери из списка'; el.classList.remove('bad'); }
+  else { el.textContent='голоса загружаются…'; }
 }
 function speak(word, el){
   if(!hasTTS) return;
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(word);
-  u.lang=accent; const v=pickVoice(); if(v) u.voice=v;
+  if(chosenVoice){ u.voice=chosenVoice; u.lang=chosenVoice.lang; } else { u.lang='en-US'; }
   u.rate = slow?0.55:0.92; u.pitch=1;
   if(el){ u.onstart=()=>el.classList.add('speaking'); u.onend=()=>el.classList.remove('speaking'); u.onerror=()=>el.classList.remove('speaking'); }
   speechSynthesis.speak(u);
 }
+const _vsel=document.getElementById('voiceSelect');
+if(_vsel) _vsel.addEventListener('change', ()=>{ chosenVoice=voiceList[+_vsel.value]||null; updateVoiceState(); });
 
 /* ---------------- build UI ---------------- */
 const cnav=document.getElementById('cnav'), sections=document.getElementById('sections');
@@ -598,12 +617,6 @@ function answer(cid, pick, el){
 }
 
 /* ---- controls ---- */
-document.getElementById('accentSeg').addEventListener('click', e=>{
-  const b=e.target.closest('[data-acc]'); if(!b) return;
-  accent=b.dataset.acc;
-  document.querySelectorAll('#accentSeg button').forEach(x=>x.classList.toggle('on',x===b));
-  updateVoiceState();
-});
 document.getElementById('speedSeg').addEventListener('click', e=>{
   const b=e.target.closest('[data-slow]'); if(!b) return;
   slow=b.dataset.slow==='1';
