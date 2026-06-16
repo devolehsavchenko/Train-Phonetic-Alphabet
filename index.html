@@ -1,543 +1,1360 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Минимальные пары — тренажёр</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0d1016; --surface:#161b24; --surface2:#1d2430; --border:#2a3340;
-    --text:#e7ebf2; --dim:#8a94a4; --faint:#5c6675;
-    --a:#54c8e8;            /* звук A — холодный */
-    --a-bg:rgba(84,200,232,.13);
-    --b:#f4a64b;            /* звук B — тёплый */
-    --b-bg:rgba(244,166,75,.13);
-    --accent:#9b8cff; --accent-bg:rgba(155,140,255,.15);
-    --good:#5fd08a; --good-bg:rgba(95,208,138,.14);
-    --bad:#ef6f6f; --bad-bg:rgba(239,111,111,.14);
-    --radius:14px;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-    --sans:'Manrope',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text);
-    font-family:var(--sans); line-height:1.6; font-size:17px;
-    padding:0 16px 80px; -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:860px; margin:0 auto}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Звуки английского — тренажёр</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #0d1016;
+        --surface: #161b24;
+        --surface2: #1d2430;
+        --border: #2a3340;
+        --text: #e7ebf2;
+        --dim: #8a94a4;
+        --faint: #5c6675;
+        --a: #54c8e8; /* звук A — холодный */
+        --a-bg: rgba(84, 200, 232, 0.13);
+        --b: #f4a64b; /* звук B — тёплый */
+        --b-bg: rgba(244, 166, 75, 0.13);
+        --accent: #9b8cff;
+        --accent-bg: rgba(155, 140, 255, 0.15);
+        --good: #5fd08a;
+        --good-bg: rgba(95, 208, 138, 0.14);
+        --bad: #ef6f6f;
+        --bad-bg: rgba(239, 111, 111, 0.14);
+        --radius: 14px;
+        --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+        --sans: 'Manrope', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.6;
+        font-size: 17px;
+        padding: 0 16px 80px;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 860px;
+        margin: 0 auto;
+      }
 
-  /* ---- hero ---- */
-  .hero{padding:46px 0 28px; text-align:left}
-  .eyebrow{font-family:var(--mono); font-size:13px; letter-spacing:.16em;
-    text-transform:uppercase; color:var(--accent); margin-bottom:14px}
-  .hero h1{font-size:clamp(2rem,6vw,3rem); line-height:1.05; margin:0 0 12px;
-    font-weight:800; letter-spacing:-.02em}
-  .hero h1 .pair{font-family:var(--mono); font-weight:700}
-  .hero h1 .pa{color:var(--a)} .hero h1 .pb{color:var(--b)}
-  .hero p{color:var(--dim); max-width:62ch; margin:0; font-size:1.02rem}
+      /* ---- hero ---- */
+      .hero {
+        padding: 46px 0 28px;
+        text-align: left;
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 13px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 14px;
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 6vw, 3rem);
+        line-height: 1.05;
+        margin: 0 0 12px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .hero h1 .pair {
+        font-family: var(--mono);
+        font-weight: 700;
+      }
+      .hero h1 .pa {
+        color: var(--a);
+      }
+      .hero h1 .pb {
+        color: var(--b);
+      }
+      .hero p {
+        color: var(--dim);
+        max-width: 62ch;
+        margin: 0;
+        font-size: 1.02rem;
+      }
 
-  /* ---- controls bar ---- */
-  .controls{position:sticky; top:0; z-index:50; background:rgba(13,16,22,.86);
-    backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
-    margin:0 -16px 26px; padding:12px 16px; display:flex; gap:10px;
-    align-items:center; flex-wrap:wrap}
-  .seg{display:inline-flex; background:var(--surface2); border:1px solid var(--border);
-    border-radius:10px; overflow:hidden}
-  .seg button{background:transparent; border:0; color:var(--dim); cursor:pointer;
-    font-family:var(--sans); font-weight:600; font-size:13px; padding:7px 14px; transition:.15s}
-  .seg button.on{background:var(--accent-bg); color:var(--accent)}
-  .voicesel{background:var(--surface2); border:1px solid var(--border); color:var(--text);
-    font-family:var(--sans); font-weight:600; font-size:13px; padding:7px 10px; border-radius:10px;
-    cursor:pointer; max-width:230px; outline:none}
-  .voicesel:focus{border-color:var(--accent)}
-  .voicesel option{background:var(--surface2); color:var(--text)}
-  .ctl-label{font-size:12px; color:var(--faint); font-family:var(--mono);
-    text-transform:uppercase; letter-spacing:.1em; margin-right:2px}
-  #voiceState{font-size:12px; color:var(--faint); margin-left:auto; font-family:var(--mono)}
-  #voiceState.bad{color:var(--bad)}
+      /* ---- controls bar ---- */
+      .controls {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(13, 16, 22, 0.86);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        margin: 0 -16px 26px;
+        padding: 12px 16px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .seg {
+        display: inline-flex;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .seg button {
+        background: transparent;
+        border: 0;
+        color: var(--dim);
+        cursor: pointer;
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 7px 14px;
+        transition: 0.15s;
+      }
+      .seg button.on {
+        background: var(--accent-bg);
+        color: var(--accent);
+      }
+      .voicesel {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 13px;
+        padding: 7px 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        max-width: 230px;
+        outline: none;
+      }
+      .voicesel:focus {
+        border-color: var(--accent);
+      }
+      .voicesel option {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .ctl-label {
+        font-size: 12px;
+        color: var(--faint);
+        font-family: var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-right: 2px;
+      }
+      #voiceState {
+        font-size: 12px;
+        color: var(--faint);
+        margin-left: auto;
+        font-family: var(--mono);
+      }
+      #voiceState.bad {
+        color: var(--bad);
+      }
 
-  /* ---- intro ---- */
-  .intro{background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius); padding:20px 22px; margin-bottom:26px; font-size:.97rem}
-  .intro b{color:var(--text)}
-  .intro .legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:.9rem}
-  .chiplegend{display:inline-flex; align-items:center; gap:7px}
-  .dot{width:12px; height:12px; border-radius:50%}
-  .dot.a{background:var(--a)} .dot.b{background:var(--b)}
+      /* ---- intro ---- */
+      .intro {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 26px;
+        font-size: 0.97rem;
+      }
+      .intro b {
+        color: var(--text);
+      }
+      .intro .legend {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+        font-size: 0.9rem;
+      }
+      .chiplegend {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .dot.a {
+        background: var(--a);
+      }
+      .dot.b {
+        background: var(--b);
+      }
 
-  /* ---- contrast nav ---- */
-  .cnav{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px}
-  .cnav button{font-family:var(--mono); font-weight:600; font-size:14px;
-    background:var(--surface2); border:1px solid var(--border); color:var(--dim);
-    padding:8px 13px; border-radius:10px; cursor:pointer; transition:.15s}
-  .cnav button:hover{border-color:var(--faint); color:var(--text)}
-  .cnav button.active{border-color:var(--accent); color:var(--text); background:var(--accent-bg)}
-  .cgroup{flex-basis:100%; font-family:var(--mono); font-size:.72rem; text-transform:uppercase;
-    letter-spacing:.13em; color:var(--faint); margin:10px 0 2px}
-  .cgroup:first-child{margin-top:0}
+      /* ---- contrast nav ---- */
+      .cnav {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+      }
+      .cnav button {
+        font-family: var(--mono);
+        font-weight: 600;
+        font-size: 14px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--dim);
+        padding: 8px 13px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .cnav button:hover {
+        border-color: var(--faint);
+        color: var(--text);
+      }
+      .cnav button.active {
+        border-color: var(--accent);
+        color: var(--text);
+        background: var(--accent-bg);
+      }
+      .cgroup {
+        flex-basis: 100%;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--faint);
+        margin: 10px 0 2px;
+      }
+      .cgroup:first-child {
+        margin-top: 0;
+      }
 
-  /* ---- contrast section ---- */
-  .contrast{display:none; animation:fade .25s ease}
-  .contrast.show{display:block}
-  @keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+      /* ---- contrast section ---- */
+      .contrast {
+        display: none;
+        animation: fade 0.25s ease;
+      }
+      .contrast.show {
+        display: block;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-  .c-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
-  .c-head h2{font-family:var(--mono); font-size:1.9rem; margin:0; font-weight:700}
-  .c-head .sa{color:var(--a)} .c-head .sb{color:var(--b)} .c-head .vs{color:var(--faint); font-weight:400}
-  .c-sub{color:var(--dim); margin:0 0 20px; font-size:.96rem}
+      .c-head {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+      .c-head h2 {
+        font-family: var(--mono);
+        font-size: 1.9rem;
+        margin: 0;
+        font-weight: 700;
+      }
+      .c-head .sa {
+        color: var(--a);
+      }
+      .c-head .sb {
+        color: var(--b);
+      }
+      .c-head .vs {
+        color: var(--faint);
+        font-weight: 400;
+      }
+      .c-sub {
+        color: var(--dim);
+        margin: 0 0 20px;
+        font-size: 0.96rem;
+      }
 
-  .note{border-radius:12px; padding:15px 18px; margin-bottom:14px; font-size:.95rem}
-  .note h4{margin:0 0 6px; font-size:.78rem; text-transform:uppercase; letter-spacing:.1em;
-    font-family:var(--mono)}
-  .note.diff{background:var(--surface); border:1px solid var(--border)}
-  .note.diff h4{color:var(--accent)}
-  .note.err{background:var(--bad-bg); border:1px solid rgba(239,111,111,.3)}
-  .note.err h4{color:var(--bad)}
+      .note {
+        border-radius: 12px;
+        padding: 15px 18px;
+        margin-bottom: 14px;
+        font-size: 0.95rem;
+      }
+      .note h4 {
+        margin: 0 0 6px;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-family: var(--mono);
+      }
+      .note.diff {
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+      .note.diff h4 {
+        color: var(--accent);
+      }
+      .note.err {
+        background: var(--bad-bg);
+        border: 1px solid rgba(239, 111, 111, 0.3);
+      }
+      .note.err h4 {
+        color: var(--bad);
+      }
 
-  /* ---- word pairs ---- */
-  .pairs{margin:22px 0 8px}
-  .pair-row{display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:stretch;
-    margin-bottom:10px}
-  .word{display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:3px; padding:12px 8px; border-radius:11px; cursor:pointer; border:1px solid var(--border);
-    background:var(--surface); transition:.14s; user-select:none}
-  .word:hover{transform:translateY(-1px)}
-  .word.a{border-color:rgba(84,200,232,.35)} .word.a:hover{background:var(--a-bg)}
-  .word.b{border-color:rgba(244,166,75,.35)} .word.b:hover{background:var(--b-bg)}
-  .word .w{font-size:1.18rem; font-weight:700; letter-spacing:.01em}
-  .word.a .w{color:var(--a)} .word.b .w{color:var(--b)}
-  .word .ipa{font-family:var(--mono); font-size:.84rem; color:var(--dim)}
-  .word.speaking{box-shadow:0 0 0 2px currentColor inset}
-  .word.a.speaking{color:var(--a)} .word.b.speaking{color:var(--b)}
-  .both{display:flex; align-items:center; justify-content:center}
-  .both button{background:var(--surface2); border:1px solid var(--border); color:var(--dim);
-    border-radius:10px; width:42px; cursor:pointer; font-size:15px; height:100%; transition:.14s}
-  .both button:hover{color:var(--text); border-color:var(--faint)}
+      /* ---- word pairs ---- */
+      .pairs {
+        margin: 22px 0 8px;
+      }
+      .pair-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 10px;
+        align-items: stretch;
+        margin-bottom: 10px;
+      }
+      .word {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 12px 8px;
+        border-radius: 11px;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        transition: 0.14s;
+        user-select: none;
+      }
+      .word:hover {
+        transform: translateY(-1px);
+      }
+      .word.a {
+        border-color: rgba(84, 200, 232, 0.35);
+      }
+      .word.a:hover {
+        background: var(--a-bg);
+      }
+      .word.b {
+        border-color: rgba(244, 166, 75, 0.35);
+      }
+      .word.b:hover {
+        background: var(--b-bg);
+      }
+      .word .w {
+        font-size: 1.18rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+      .word.a .w {
+        color: var(--a);
+      }
+      .word.b .w {
+        color: var(--b);
+      }
+      .word .ipa {
+        font-family: var(--mono);
+        font-size: 0.84rem;
+        color: var(--dim);
+      }
+      .word.speaking {
+        box-shadow: 0 0 0 2px currentColor inset;
+      }
+      .word.a.speaking {
+        color: var(--a);
+      }
+      .word.b.speaking {
+        color: var(--b);
+      }
+      .both {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .both button {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--dim);
+        border-radius: 10px;
+        width: 42px;
+        cursor: pointer;
+        font-size: 15px;
+        height: 100%;
+        transition: 0.14s;
+      }
+      .both button:hover {
+        color: var(--text);
+        border-color: var(--faint);
+      }
 
-  /* ---- quiz ---- */
-  .quiz{margin-top:24px; background:var(--surface); border:1px solid var(--border);
-    border-radius:var(--radius); padding:20px 22px}
-  .quiz h3{margin:0 0 4px; font-size:1.05rem}
-  .quiz .qhint{color:var(--dim); font-size:.9rem; margin:0 0 16px}
-  .qbtns{display:flex; gap:12px; margin:16px 0}
-  .qbtns .opt{flex:1; padding:16px; border-radius:12px; border:1px solid var(--border);
-    background:var(--surface2); cursor:pointer; font-family:var(--mono); font-size:1.1rem;
-    font-weight:700; transition:.14s; text-align:center}
-  .opt.oa{color:var(--a)} .opt.ob{color:var(--b)}
-  .qbtns .opt:hover{border-color:var(--faint)}
-  .qbtns .opt.correct{background:var(--good-bg); border-color:var(--good); color:var(--good)}
-  .qbtns .opt.wrong{background:var(--bad-bg); border-color:var(--bad); color:var(--bad)}
-  .qbtns.locked .opt{cursor:default}
-  .qrow{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-  .btn{background:var(--accent); color:#0d1016; border:0; border-radius:10px; cursor:pointer;
-    font-family:var(--sans); font-weight:700; font-size:.95rem; padding:11px 20px; transition:.14s}
-  .btn:hover{filter:brightness(1.08)}
-  .btn.ghost{background:transparent; border:1px solid var(--border); color:var(--dim)}
-  .btn.ghost:hover{color:var(--text); border-color:var(--faint)}
-  .score{font-family:var(--mono); font-size:.9rem; color:var(--dim); margin-left:auto}
-  .score b{color:var(--text)}
-  .feedback{font-size:.92rem; margin-top:14px; min-height:1.2em; font-weight:600}
-  .feedback.ok{color:var(--good)} .feedback.no{color:var(--bad)}
+      /* ---- quiz ---- */
+      .quiz {
+        margin-top: 24px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+      }
+      .quiz h3 {
+        margin: 0 0 4px;
+        font-size: 1.05rem;
+      }
+      .quiz .qhint {
+        color: var(--dim);
+        font-size: 0.9rem;
+        margin: 0 0 16px;
+      }
+      .qbtns {
+        display: flex;
+        gap: 12px;
+        margin: 16px 0;
+      }
+      .qbtns .opt {
+        flex: 1;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        cursor: pointer;
+        font-family: var(--mono);
+        font-size: 1.1rem;
+        font-weight: 700;
+        transition: 0.14s;
+        text-align: center;
+      }
+      .opt.oa {
+        color: var(--a);
+      }
+      .opt.ob {
+        color: var(--b);
+      }
+      .qbtns .opt:hover {
+        border-color: var(--faint);
+      }
+      .qbtns .opt.correct {
+        background: var(--good-bg);
+        border-color: var(--good);
+        color: var(--good);
+      }
+      .qbtns .opt.wrong {
+        background: var(--bad-bg);
+        border-color: var(--bad);
+        color: var(--bad);
+      }
+      .qbtns.locked .opt {
+        cursor: default;
+      }
+      .qrow {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        background: var(--accent);
+        color: #0d1016;
+        border: 0;
+        border-radius: 10px;
+        cursor: pointer;
+        font-family: var(--sans);
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 11px 20px;
+        transition: 0.14s;
+      }
+      .btn:hover {
+        filter: brightness(1.08);
+      }
+      .btn.ghost {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--dim);
+      }
+      .btn.ghost:hover {
+        color: var(--text);
+        border-color: var(--faint);
+      }
+      .score {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        color: var(--dim);
+        margin-left: auto;
+      }
+      .score b {
+        color: var(--text);
+      }
+      .feedback {
+        font-size: 0.92rem;
+        margin-top: 14px;
+        min-height: 1.2em;
+        font-weight: 600;
+      }
+      .feedback.ok {
+        color: var(--good);
+      }
+      .feedback.no {
+        color: var(--bad);
+      }
 
-  .tip{background:var(--accent-bg); border-left:3px solid var(--accent); border-radius:0 10px 10px 0;
-    padding:13px 16px; font-size:.92rem; margin-top:22px; color:var(--text)}
-  .tip b{color:var(--accent)}
+      .tip {
+        background: var(--accent-bg);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 10px 10px 0;
+        padding: 13px 16px;
+        font-size: 0.92rem;
+        margin-top: 22px;
+        color: var(--text);
+      }
+      .tip b {
+        color: var(--accent);
+      }
 
-  .nosound{display:none; background:var(--bad-bg); border:1px solid var(--bad);
-    border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:.92rem}
+      .nosound {
+        display: none;
+        background: var(--bad-bg);
+        border: 1px solid var(--bad);
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        font-size: 0.92rem;
+      }
 
-  /* ---- view switcher ---- */
-  .viewseg{display:flex; gap:8px; margin:0 0 28px}
-  .viewseg button{flex:1; font-family:var(--sans); font-weight:700; font-size:.98rem;
-    background:var(--surface); border:1px solid var(--border); color:var(--dim);
-    padding:13px 12px; border-radius:12px; cursor:pointer; transition:.15s}
-  .viewseg button:hover{color:var(--text); border-color:var(--faint)}
-  .viewseg button.on{background:var(--accent-bg); border-color:var(--accent); color:var(--text)}
-  .view{display:none} .view.show{display:block; animation:fade .25s ease}
+      /* ---- view switcher ---- */
+      .viewseg {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 28px;
+      }
+      .viewseg button {
+        flex: 1;
+        font-family: var(--sans);
+        font-weight: 700;
+        font-size: 0.98rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--dim);
+        padding: 13px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .viewseg button:hover {
+        color: var(--text);
+        border-color: var(--faint);
+      }
+      .viewseg button.on {
+        background: var(--accent-bg);
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .view {
+        display: none;
+      }
+      .view.show {
+        display: block;
+        animation: fade 0.25s ease;
+      }
 
-  /* ---- inventory chart ---- */
-  .inv-group{margin-bottom:32px}
-  .inv-group h2{font-size:1.2rem; margin:0 0 3px; display:flex; align-items:baseline; gap:10px}
-  .inv-group h2 .gcount{font-family:var(--mono); font-size:.8rem; color:var(--faint); font-weight:600}
-  .inv-group .gdesc{color:var(--dim); font-size:.92rem; margin:0 0 16px}
-  .manner{font-family:var(--mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.13em;
-    color:var(--faint); margin:20px 0 11px}
-  .inv-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(98px,1fr)); gap:10px}
-  .sound{background:var(--surface); border:1px solid var(--border); border-radius:12px;
-    padding:13px 8px 12px; cursor:pointer; text-align:center; transition:.14s;
-    display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:flex-start}
-  .sound:hover{transform:translateY(-2px)}
-  .sound .sym{font-family:var(--mono); font-size:1.5rem; font-weight:700; line-height:1}
-  .sound .ex{font-size:.85rem; color:var(--dim)}
-  .sound .ex em{font-style:normal; font-weight:700}
-  .sound .snote{font-size:.68rem; color:var(--faint); line-height:1.35; margin-top:2px}
-  .sound.speaking{box-shadow:inset 0 0 0 2px currentColor}
-  .sound[data-cat="mono"]{border-color:rgba(84,200,232,.3); color:var(--a)}
-  .sound[data-cat="mono"] .sym, .sound[data-cat="mono"] .ex em{color:var(--a)}
-  .sound[data-cat="mono"]:hover{background:var(--a-bg)}
-  .sound[data-cat="diph"]{border-color:rgba(155,140,255,.32); color:var(--accent)}
-  .sound[data-cat="diph"] .sym, .sound[data-cat="diph"] .ex em{color:var(--accent)}
-  .sound[data-cat="diph"]:hover{background:var(--accent-bg)}
-  .sound[data-cat="cons"]{border-color:rgba(244,166,75,.28); color:var(--b)}
-  .sound[data-cat="cons"] .sym, .sound[data-cat="cons"] .ex em{color:var(--b)}
-  .sound[data-cat="cons"]:hover{background:var(--b-bg)}
+      /* ---- inventory chart ---- */
+      .inv-group {
+        margin-bottom: 32px;
+      }
+      .inv-group h2 {
+        font-size: 1.2rem;
+        margin: 0 0 3px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .inv-group h2 .gcount {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--faint);
+        font-weight: 600;
+      }
+      .inv-group .gdesc {
+        color: var(--dim);
+        font-size: 0.92rem;
+        margin: 0 0 16px;
+      }
+      .manner {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--faint);
+        margin: 20px 0 11px;
+      }
+      .inv-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(98px, 1fr));
+        gap: 10px;
+      }
+      .sound {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px 8px 12px;
+        cursor: pointer;
+        text-align: center;
+        transition: 0.14s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      .sound:hover {
+        transform: translateY(-2px);
+      }
+      .sound .sym {
+        font-family: var(--mono);
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+      }
+      .sound .ex {
+        font-size: 0.85rem;
+        color: var(--dim);
+      }
+      .sound .ex em {
+        font-style: normal;
+        font-weight: 700;
+      }
+      .sound .tr {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--faint);
+      }
+      .sound .snote {
+        font-size: 0.68rem;
+        color: var(--faint);
+        line-height: 1.35;
+        margin-top: 2px;
+      }
+      .sound.speaking {
+        box-shadow: inset 0 0 0 2px currentColor;
+      }
+      .sound[data-cat='mono'] {
+        border-color: rgba(84, 200, 232, 0.3);
+        color: var(--a);
+      }
+      .sound[data-cat='mono'] .sym,
+      .sound[data-cat='mono'] .ex em {
+        color: var(--a);
+      }
+      .sound[data-cat='mono']:hover {
+        background: var(--a-bg);
+      }
+      .sound[data-cat='diph'] {
+        border-color: rgba(155, 140, 255, 0.32);
+        color: var(--accent);
+      }
+      .sound[data-cat='diph'] .sym,
+      .sound[data-cat='diph'] .ex em {
+        color: var(--accent);
+      }
+      .sound[data-cat='diph']:hover {
+        background: var(--accent-bg);
+      }
+      .sound[data-cat='cons'] {
+        border-color: rgba(244, 166, 75, 0.28);
+        color: var(--b);
+      }
+      .sound[data-cat='cons'] .sym,
+      .sound[data-cat='cons'] .ex em {
+        color: var(--b);
+      }
+      .sound[data-cat='cons']:hover {
+        background: var(--b-bg);
+      }
 
-  @media(max-width:560px){
-    .inv-grid{grid-template-columns:repeat(auto-fill,minmax(82px,1fr))}
-    .sound .sym{font-size:1.3rem}
-    .viewseg button{font-size:.9rem; padding:12px 8px}
-    body{font-size:16px}
-    .pair-row{grid-template-columns:1fr auto 1fr}
-    .word .w{font-size:1.05rem}
-    .qbtns{flex-direction:column}
-    .c-head h2{font-size:1.5rem}
-  }
-  @media(prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
-</style>
-</head>
-<body>
-<div class="wrap">
+      @media (max-width: 560px) {
+        .inv-grid {
+          grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+        }
+        .sound .sym {
+          font-size: 1.3rem;
+        }
+        .viewseg button {
+          font-size: 0.9rem;
+          padding: 12px 8px;
+        }
+        body {
+          font-size: 16px;
+        }
+        .pair-row {
+          grid-template-columns: 1fr auto 1fr;
+        }
+        .word .w {
+          font-size: 1.05rem;
+        }
+        .qbtns {
+          flex-direction: column;
+        }
+        .c-head h2 {
+          font-size: 1.5rem;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="hero">
+        <div class="eyebrow">Фонетика английского</div>
+        <h1>Звуки английского</h1>
+        <p>Полная карта всех <b>44 звуков</b> с озвучкой — плюс тренажёр минимальных пар на самые трудные для русскоговорящих контрасты. Нажимай на любой звук или слово, чтобы услышать его.</p>
+      </div>
 
-  <div class="hero">
-    <div class="eyebrow">Фонетика английского</div>
-    <h1>Звуки английского</h1>
-    <p>Полная карта всех <b>44 звуков</b> с озвучкой — плюс тренажёр минимальных пар на самые трудные для русскоговорящих контрасты. Нажимай на любой звук или слово, чтобы услышать его.</p>
-  </div>
+      <div class="controls">
+        <span class="ctl-label">Голос</span>
+        <select id="voiceSelect" class="voicesel" aria-label="Выбор голоса"></select>
+        <span class="ctl-label">Темп</span>
+        <div class="seg" id="speedSeg">
+          <button data-slow="0" class="on">Обычный</button>
+          <button data-slow="1">Медленно</button>
+        </div>
+        <span id="voiceState">проверяю голоса…</span>
+      </div>
 
-  <div class="controls">
-    <span class="ctl-label">Голос</span>
-    <select id="voiceSelect" class="voicesel" aria-label="Выбор голоса"></select>
-    <span class="ctl-label">Темп</span>
-    <div class="seg" id="speedSeg">
-      <button data-slow="0" class="on">Обычный</button>
-      <button data-slow="1">Медленно</button>
-    </div>
-    <span id="voiceState">проверяю голоса…</span>
-  </div>
+      <div class="nosound" id="nosound">В этом браузере не работает синтез речи. Открой файл в <b>Chrome</b> или <b>Edge</b> — там работает озвучка. Текст, IPA и упражнения доступны и без звука.</div>
 
-  <div class="nosound" id="nosound">
-    В этом браузере не работает синтез речи. Открой файл в <b>Chrome</b> или <b>Edge</b> — там работает озвучка. Текст, IPA и упражнения доступны и без звука.
-  </div>
+      <div class="viewseg" id="viewseg">
+        <button data-view="inventory" class="on">Звуки</button>
+        <button data-view="pairs">Сравнение звуков</button>
+      </div>
 
-  <div class="viewseg" id="viewseg">
-    <button data-view="inventory" class="on">Все 44 звука</button>
-    <button data-view="pairs">Минимальные пары</button>
-  </div>
+      <!-- ============ VIEW: 44 SOUNDS ============ -->
+      <div class="view show" id="view-inventory">
+        <div class="intro">
+          <b>Справочник всех 44 звуков</b> английского (британская модель RP — это и есть классический «набор 44 phonemes»). Нажми на любую плитку, чтобы услышать звук в слове. В примерах целевой звук <b>выделен</b>. Где американское произношение заметно отличается — есть пометка; выбери американский или британский голос в списке сверху, чтобы услышать разницу.
+          <div class="legend">
+            <span class="chiplegend"><span class="dot a"></span> монофтонги</span>
+            <span class="chiplegend"><span class="dot" style="background: var(--accent)"></span> дифтонги</span>
+            <span class="chiplegend"><span class="dot b"></span> согласные</span>
+          </div>
+        </div>
+        <div id="inventoryBody"></div>
+      </div>
 
-  <!-- ============ VIEW: 44 SOUNDS ============ -->
-  <div class="view show" id="view-inventory">
-    <div class="intro">
-      <b>Справочник всех 44 звуков</b> английского (британская модель RP — это и есть классический «набор 44 phonemes»). Нажми на любую плитку, чтобы услышать звук в слове. В примерах целевой звук <b>выделен</b>. Где американское произношение заметно отличается — есть пометка; выбери американский или британский голос в списке сверху, чтобы услышать разницу.
-      <div class="legend">
-        <span class="chiplegend"><span class="dot a"></span> монофтонги</span>
-        <span class="chiplegend"><span class="dot" style="background:var(--accent)"></span> дифтонги</span>
-        <span class="chiplegend"><span class="dot b"></span> согласные</span>
+      <!-- ============ VIEW: MINIMAL PAIRS ============ -->
+      <div class="view" id="view-pairs">
+        <div class="intro">
+          <b>Как тренироваться.</b> Нажми на слово, чтобы услышать его. Кнопка между парой проигрывает оба слова подряд — лови разницу. Когда контраст начнёт «звучать» в голове, открой <b>тренировку на слух</b> внизу каждого раздела: браузер произнесёт одно слово случайно, а ты угадаешь какое. Это и есть главный навык — различать на слух то, что в русском сливается в один звук.
+          <div class="legend">
+            <span class="chiplegend"><span class="dot a"></span> первый звук пары</span>
+            <span class="chiplegend"><span class="dot b"></span> второй звук пары</span>
+          </div>
+        </div>
+
+        <div class="cnav" id="cnav"></div>
+
+        <div id="sections"></div>
       </div>
     </div>
-    <div id="inventoryBody"></div>
-  </div>
 
-  <!-- ============ VIEW: MINIMAL PAIRS ============ -->
-  <div class="view" id="view-pairs">
-    <div class="intro">
-      <b>Как тренироваться.</b> Нажми на слово, чтобы услышать его. Кнопка между парой проигрывает оба слова подряд — лови разницу. Когда контраст начнёт «звучать» в голове, открой <b>тренировку на слух</b> внизу каждого раздела: браузер произнесёт одно слово случайно, а ты угадаешь какое. Это и есть главный навык — различать на слух то, что в русском сливается в один звук.
-      <div class="legend">
-        <span class="chiplegend"><span class="dot a"></span> первый звук пары</span>
-        <span class="chiplegend"><span class="dot b"></span> второй звук пары</span>
-      </div>
-    </div>
+    <script>
+      /* ---------------- data ---------------- */
+      const CONTRASTS = [
+        // ===== ГЛАСНЫЕ =====
+        {
+          id: 'i',
+          cat: 'v',
+          tab: 'ɪ / iː',
+          a: { ipa: 'ɪ' },
+          b: { ipa: 'iː' },
+          sub: 'Короткий расслабленный /ɪ/ против долгого напряжённого /iː/',
+          diff: 'Разница не только в долготе. /ɪ/ — язык ниже и расслаблен, звук между русскими «и» и «ы» (sit). /iː/ — язык высоко и вперёд, мышцы напряжены, губы слегка растянуты, как в улыбке (seat). Долгота — лишь следствие.',
+          err: 'Русскоговорящие произносят оба звука как русское «и», и ship превращается в sheep. Запомни: /ɪ/ — короткий и «ленивый», /iː/ — длинный и «улыбающийся».',
+          pairs: [
+            ['ship', '/ʃɪp/', 'sheep', '/ʃiːp/'],
+            ['bit', '/bɪt/', 'beat', '/biːt/'],
+            ['fit', '/fɪt/', 'feet', '/fiːt/'],
+            ['chip', '/tʃɪp/', 'cheap', '/tʃiːp/'],
+            ['fill', '/fɪl/', 'feel', '/fiːl/'],
+            ['rich', '/rɪtʃ/', 'reach', '/riːtʃ/'],
+            ['sit', '/sɪt/', 'seat', '/siːt/'],
+            ['hit', '/hɪt/', 'heat', '/hiːt/'],
+          ],
+        },
+        {
+          id: 'ae_e',
+          cat: 'v',
+          tab: 'æ / e',
+          a: { ipa: 'æ' },
+          b: { ipa: 'e' },
+          sub: 'Широкое открытое /æ/ против узкого /e/',
+          diff: '/æ/ — рот открыт широко, челюсть опущена, язык плоский и низкий впереди (cat). /e/ — рот приоткрыт меньше, язык чуть выше, звук как русское «э» в «эти» (bed). Главное — насколько широко открыт рот.',
+          err: 'Оба звука часто заменяют русским «э», поэтому bad и bed звучат одинаково. Чтобы получить /æ/, опусти челюсть сильнее, будто говоришь «э» и одновременно зеваешь.',
+          pairs: [
+            ['bad', '/bæd/', 'bed', '/bed/'],
+            ['man', '/mæn/', 'men', '/men/'],
+            ['sat', '/sæt/', 'set', '/set/'],
+            ['bat', '/bæt/', 'bet', '/bet/'],
+            ['had', '/hæd/', 'head', '/hed/'],
+            ['pan', '/pæn/', 'pen', '/pen/'],
+            ['gas', '/ɡæs/', 'guess', '/ɡes/'],
+            ['and', '/ænd/', 'end', '/end/'],
+          ],
+        },
+        {
+          id: 'ae_uh',
+          cat: 'v',
+          tab: 'æ / ʌ',
+          a: { ipa: 'æ' },
+          b: { ipa: 'ʌ' },
+          sub: 'Переднее открытое /æ/ против центрального /ʌ/',
+          diff: '/æ/ — звук впереди рта, рот широкий, как «э» с опущенной челюстью (cat). /ʌ/ — звук в центре рта, короткий и тусклый, ближе к русскому «а» в безударном слоге (cut). Это разные точки: перёд против центра.',
+          err: '/ʌ/ часто тянут как русское «а», а /æ/ делают тем же «а» — и cat сливается с cut. Держи /æ/ впереди и широким, а /ʌ/ — коротким и нейтральным.',
+          pairs: [
+            ['cat', '/kæt/', 'cut', '/kʌt/'],
+            ['cap', '/kæp/', 'cup', '/kʌp/'],
+            ['ran', '/ræn/', 'run', '/rʌn/'],
+            ['match', '/mætʃ/', 'much', '/mʌtʃ/'],
+            ['bat', '/bæt/', 'but', '/bʌt/'],
+            ['fan', '/fæn/', 'fun', '/fʌn/'],
+            ['bag', '/bæɡ/', 'bug', '/bʌɡ/'],
+            ['ankle', '/ˈæŋkl/', 'uncle', '/ˈʌŋkl/'],
+          ],
+        },
+        {
+          id: 'uh_ar',
+          cat: 'v',
+          tab: 'ʌ / ɑː',
+          a: { ipa: 'ʌ' },
+          b: { ipa: 'ɑː' },
+          sub: 'Короткий центральный /ʌ/ против долгого заднего /ɑː/',
+          diff: '/ʌ/ — короткий, в центре рта (cut). /ɑː/ — долгий, рот шире, звук «глубже» и идёт из задней части (cart). В американском в cart слышно r на конце.',
+          err: 'Оба тянут как русское «а». Сделай /ʌ/ коротким и нейтральным, а /ɑː/ — заметно длиннее и «темнее».',
+          pairs: [
+            ['cut', '/kʌt/', 'cart', '/kɑːt/'],
+            ['luck', '/lʌk/', 'lark', '/lɑːk/'],
+            ['bun', '/bʌn/', 'barn', '/bɑːn/'],
+            ['hut', '/hʌt/', 'heart', '/hɑːt/'],
+            ['come', '/kʌm/', 'calm', '/kɑːm/'],
+            ['duck', '/dʌk/', 'dark', '/dɑːk/'],
+          ],
+        },
+        {
+          id: 'o_or',
+          cat: 'v',
+          tab: 'ɒ / ɔː',
+          a: { ipa: 'ɒ' },
+          b: { ipa: 'ɔː' },
+          sub: 'Короткий округлённый /ɒ/ против долгого /ɔː/',
+          diff: '/ɒ/ — короткий округлённый гласный (hot). /ɔː/ — долгий, губы сильнее округлены (saw). В американском /ɒ/ обычно сливается с /ɑː/, а в словах с r (port, short) слышно r.',
+          err: 'Главное — длина и округление. /ɔː/ заметно дольше и «полнее».',
+          pairs: [
+            ['cot', '/kɒt/', 'caught', '/kɔːt/'],
+            ['don', '/dɒn/', 'dawn', '/dɔːn/'],
+            ['shot', '/ʃɒt/', 'short', '/ʃɔːt/'],
+            ['cod', '/kɒd/', 'cord', '/kɔːd/'],
+            ['pot', '/pɒt/', 'port', '/pɔːt/'],
+            ['spot', '/spɒt/', 'sport', '/spɔːt/'],
+          ],
+        },
+        {
+          id: 'u_uu',
+          cat: 'v',
+          tab: 'ʊ / uː',
+          a: { ipa: 'ʊ' },
+          b: { ipa: 'uː' },
+          sub: 'Короткий расслабленный /ʊ/ против долгого /uː/',
+          diff: '/ʊ/ — короткий, губы расслаблены (book). /uː/ — долгий, губы сильно округлены в трубочку (boot).',
+          err: 'Оба произносят как русское «у». Сделай /ʊ/ коротким и расслабленным, а /uː/ — долгим, с губами в плотную трубочку.',
+          pairs: [
+            ['full', '/fʊl/', 'fool', '/fuːl/'],
+            ['pull', '/pʊl/', 'pool', '/puːl/'],
+            ['look', '/lʊk/', 'Luke', '/luːk/'],
+            ['soot', '/sʊt/', 'suit', '/suːt/'],
+            ['could', '/kʊd/', 'cooed', '/kuːd/'],
+            ['wood', '/wʊd/', 'wooed', '/wuːd/'],
+          ],
+        },
+        {
+          id: 'er_or',
+          cat: 'v',
+          tab: 'ɜː / ɔː',
+          a: { ipa: 'ɜː' },
+          b: { ipa: 'ɔː' },
+          sub: 'Центральный /ɜː/ против заднего округлённого /ɔː/',
+          diff: '/ɜː/ — долгий нейтральный звук в центре рта, губы не округлены (bird). /ɔː/ — долгий, губы округлены, звук идёт из задней части (board). В американском оба часто звучат с r-окраской.',
+          err: '/ɜː/ путают с русским «ё/о» и округляют губы. Держи губы нейтральными, без округления.',
+          pairs: [
+            ['bird', '/bɜːd/', 'board', '/bɔːd/'],
+            ['shirt', '/ʃɜːt/', 'short', '/ʃɔːt/'],
+            ['word', '/wɜːd/', 'ward', '/wɔːd/'],
+            ['fur', '/fɜː/', 'four', '/fɔː/'],
+            ['stir', '/stɜː/', 'store', '/stɔː/'],
+            ['burn', '/bɜːn/', 'born', '/bɔːn/'],
+          ],
+        },
+        {
+          id: 'ei_e',
+          cat: 'v',
+          tab: 'eɪ / e',
+          a: { ipa: 'eɪ' },
+          b: { ipa: 'e' },
+          sub: 'Дифтонг /eɪ/ против короткого монофтонга /e/',
+          diff: '/eɪ/ — скольжение от «э» к «и» («эй»), долгий (late). /e/ — короткий монофтонг, без движения (let).',
+          err: '/eɪ/ нельзя произносить как короткое «э». Это «эй» с явным скольжением вверх.',
+          pairs: [
+            ['late', '/leɪt/', 'let', '/let/'],
+            ['pain', '/peɪn/', 'pen', '/pen/'],
+            ['tale', '/teɪl/', 'tell', '/tel/'],
+            ['main', '/meɪn/', 'men', '/men/'],
+            ['raid', '/reɪd/', 'red', '/red/'],
+            ['wait', '/weɪt/', 'wet', '/wet/'],
+          ],
+        },
+        {
+          id: 'ou_or',
+          cat: 'v',
+          tab: 'əʊ / ɔː',
+          a: { ipa: 'əʊ' },
+          b: { ipa: 'ɔː' },
+          sub: 'Дифтонг /əʊ/ против долгого /ɔː/',
+          diff: '/əʊ/ — скольжение от нейтрального «ə» к «у» («оу»), есть движение (boat). /ɔː/ — долгий монофтонг, без движения (bought). В американском /əʊ/ звучит как /oʊ/ — губы круглее.',
+          err: '/əʊ/ часто путают с /ɔː/ или делают слишком закруглённым русским «оу». Начинай с нейтрального звука.',
+          pairs: [
+            ['so', '/səʊ/', 'saw', '/sɔː/'],
+            ['low', '/ləʊ/', 'law', '/lɔː/'],
+            ['boat', '/bəʊt/', 'bought', '/bɔːt/'],
+            ['coat', '/kəʊt/', 'caught', '/kɔːt/'],
+            ['phone', '/fəʊn/', 'fawn', '/fɔːn/'],
+            ['bowl', '/bəʊl/', 'ball', '/bɔːl/'],
+          ],
+        },
+        {
+          id: 'ai_ei',
+          cat: 'v',
+          tab: 'aɪ / eɪ',
+          a: { ipa: 'aɪ' },
+          b: { ipa: 'eɪ' },
+          sub: 'Дифтонг /aɪ/ против дифтонга /eɪ/',
+          diff: '/aɪ/ — «ай» (от открытого «а» к «и»). /eɪ/ — «эй» (от «э» к «и»). Разные стартовые точки скольжения.',
+          err: 'Путают начало дифтонга. /aɪ/ стартует с широкого открытого «а».',
+          pairs: [
+            ['buy', '/baɪ/', 'bay', '/beɪ/'],
+            ['lie', '/laɪ/', 'lay', '/leɪ/'],
+            ['my', '/maɪ/', 'may', '/meɪ/'],
+            ['ride', '/raɪd/', 'raid', '/reɪd/'],
+            ['die', '/daɪ/', 'day', '/deɪ/'],
+            ['wine', '/waɪn/', 'wane', '/weɪn/'],
+          ],
+        },
+        {
+          id: 'au_ou',
+          cat: 'v',
+          tab: 'aʊ / əʊ',
+          a: { ipa: 'aʊ' },
+          b: { ipa: 'əʊ' },
+          sub: 'Дифтонг /aʊ/ против дифтонга /əʊ/',
+          diff: '/aʊ/ — «ау» (от открытого «а» к «у»). /əʊ/ — «оу» (от нейтрального «ə» к «у»). Разница в стартовой гласной.',
+          err: 'Оба сводят к похожему «а/о». /aʊ/ начинается с явного открытого «а».',
+          pairs: [
+            ['now', '/naʊ/', 'no', '/nəʊ/'],
+            ['loud', '/laʊd/', 'load', '/ləʊd/'],
+            ['town', '/taʊn/', 'tone', '/təʊn/'],
+            ['found', '/faʊnd/', 'phoned', '/fəʊnd/'],
+            ['doubt', '/daʊt/', 'dote', '/dəʊt/'],
+            ['bout', '/baʊt/', 'boat', '/bəʊt/'],
+          ],
+        },
+        {
+          id: 'oi_ai',
+          cat: 'v',
+          tab: 'ɔɪ / aɪ',
+          a: { ipa: 'ɔɪ' },
+          b: { ipa: 'aɪ' },
+          sub: 'Дифтонг /ɔɪ/ против дифтонга /aɪ/',
+          diff: '/ɔɪ/ — «ой» (от округлённого «о» к «и»). /aɪ/ — «ай» (от открытого «а» к «и»). Разное начало.',
+          err: 'Слушай стартовую гласную: округлённое «о» против широкого «а».',
+          pairs: [
+            ['boy', '/bɔɪ/', 'buy', '/baɪ/'],
+            ['toy', '/tɔɪ/', 'tie', '/taɪ/'],
+            ['oil', '/ɔɪl/', 'aisle', '/aɪl/'],
+            ['boil', '/bɔɪl/', 'bile', '/baɪl/'],
+            ['voice', '/vɔɪs/', 'vice', '/vaɪs/'],
+            ['Roy', '/rɔɪ/', 'rye', '/raɪ/'],
+          ],
+        },
+        {
+          id: 'ear_air',
+          cat: 'v',
+          tab: 'ɪə / eə',
+          a: { ipa: 'ɪə' },
+          b: { ipa: 'eə' },
+          sub: 'Центрирующий дифтонг /ɪə/ против /eə/',
+          diff: '/ɪə/ начинается с «и» и скользит к нейтральному «ə» (here). /eə/ начинается с «э» (hair). В американском оба идут с r: /ɪr/ и /er/.',
+          err: 'Оба сводят к «эа». Слушай стартовую гласную: «и» против «э».',
+          pairs: [
+            ['beer', '/bɪə/', 'bear', '/beə/'],
+            ['here', '/hɪə/', 'hair', '/heə/'],
+            ['fear', '/fɪə/', 'fair', '/feə/'],
+            ['ear', '/ɪə/', 'air', '/eə/'],
+            ['cheer', '/tʃɪə/', 'chair', '/tʃeə/'],
+            ['really', '/ˈrɪəli/', 'rarely', '/ˈreəli/'],
+          ],
+        },
+        // ===== СОГЛАСНЫЕ =====
+        {
+          id: 'th_s',
+          cat: 'c',
+          tab: 'θ / s',
+          a: { ipa: 'θ' },
+          b: { ipa: 's' },
+          sub: 'Межзубный /θ/ против свистящего /s/',
+          diff: '/θ/ — кончик языка между зубами, воздух идёт поверх языка (think). /s/ — язык за верхними зубами, узкая струя воздуха даёт свист (sink).',
+          err: 'В русском нет /θ/, поэтому его заменяют на /s/, /t/ или /f/. Просунь кончик языка между зубами и подуй.',
+          pairs: [
+            ['think', '/θɪŋk/', 'sink', '/sɪŋk/'],
+            ['thick', '/θɪk/', 'sick', '/sɪk/'],
+            ['thing', '/θɪŋ/', 'sing', '/sɪŋ/'],
+            ['mouth', '/maʊθ/', 'mouse', '/maʊs/'],
+            ['path', '/pɑːθ/', 'pass', '/pɑːs/'],
+            ['thumb', '/θʌm/', 'sum', '/sʌm/'],
+            ['theme', '/θiːm/', 'seem', '/siːm/'],
+            ['worth', '/wɜːθ/', 'worse', '/wɜːs/'],
+          ],
+        },
+        {
+          id: 'th_d',
+          cat: 'c',
+          tab: 'ð / d·z',
+          a: { ipa: 'ð' },
+          b: { ipa: 'd/z' },
+          sub: 'Звонкий межзубный /ð/ против /d/ и /z/',
+          diff: '/ð/ — язык между зубами, но с голосом, связки вибрируют (they, this). /d/ делается языком за зубами, /z/ — свист с голосом.',
+          err: '/ð/ заменяют на /d/ («дей») или /z/ («бразер»). Поставь язык между зубами и включи голос.',
+          pairs: [
+            ['they', '/ðeɪ/', 'day', '/deɪ/'],
+            ['then', '/ðen/', 'den', '/den/'],
+            ['though', '/ðəʊ/', 'dough', '/dəʊ/'],
+            ['there', '/ðeə/', 'dare', '/deə/'],
+            ['than', '/ðæn/', 'Dan', '/dæn/'],
+            ['breathe', '/briːð/', 'breeze', '/briːz/'],
+            ['those', '/ðəʊz/', 'doze', '/dəʊz/'],
+            ['bathe', '/beɪð/', 'bays', '/beɪz/'],
+          ],
+        },
+        {
+          id: 'w_v',
+          cat: 'c',
+          tab: 'w / v',
+          a: { ipa: 'w' },
+          b: { ipa: 'v' },
+          sub: 'Губной /w/ против губно-зубного /v/',
+          diff: '/w/ — губы округлены и не касаются зубов, звук как «у» в начале (wine). /v/ — нижняя губа касается верхних зубов, как русское «в» (vine).',
+          err: 'Русское «в» ставят на оба звука. Для /w/ убери зубы от губы и округли губы, как для «у».',
+          pairs: [
+            ['wine', '/waɪn/', 'vine', '/vaɪn/'],
+            ['west', '/west/', 'vest', '/vest/'],
+            ['wail', '/weɪl/', 'veil', '/veɪl/'],
+            ['worse', '/wɜːs/', 'verse', '/vɜːs/'],
+            ['wary', '/ˈweəri/', 'vary', '/ˈveəri/'],
+            ['wet', '/wet/', 'vet', '/vet/'],
+            ['while', '/waɪl/', 'vile', '/vaɪl/'],
+          ],
+        },
+        {
+          id: 's_sh',
+          cat: 'c',
+          tab: 's / ʃ',
+          a: { ipa: 's' },
+          b: { ipa: 'ʃ' },
+          sub: 'Свистящий /s/ против шипящего /ʃ/',
+          diff: '/s/ — язык за зубами, узкий свист (sip). /ʃ/ — язык отодвинут назад, губы чуть округлены, мягкое «ш» (ship).',
+          err: 'Английское /ʃ/ мягче русского «ш», ближе к «щ». Не делай его слишком твёрдым.',
+          pairs: [
+            ['sip', '/sɪp/', 'ship', '/ʃɪp/'],
+            ['sea', '/siː/', 'she', '/ʃiː/'],
+            ['sue', '/suː/', 'shoe', '/ʃuː/'],
+            ['save', '/seɪv/', 'shave', '/ʃeɪv/'],
+            ['mass', '/mæs/', 'mash', '/mæʃ/'],
+            ['sock', '/sɒk/', 'shock', '/ʃɒk/'],
+          ],
+        },
+        {
+          id: 'ch_sh',
+          cat: 'c',
+          tab: 'tʃ / ʃ',
+          a: { ipa: 'tʃ' },
+          b: { ipa: 'ʃ' },
+          sub: 'Аффриката /tʃ/ против фрикативного /ʃ/',
+          diff: '/tʃ/ начинается со смычки и взрыва, как «тш» (chip). /ʃ/ — чистый «ш» без смычки (ship).',
+          err: 'Путают «ч» и «ш». В /tʃ/ есть короткий взрыв в самом начале, в /ʃ/ его нет.',
+          pairs: [
+            ['chip', '/tʃɪp/', 'ship', '/ʃɪp/'],
+            ['chair', '/tʃeə/', 'share', '/ʃeə/'],
+            ['chop', '/tʃɒp/', 'shop', '/ʃɒp/'],
+            ['watch', '/wɒtʃ/', 'wash', '/wɒʃ/'],
+            ['catch', '/kætʃ/', 'cash', '/kæʃ/'],
+            ['cheat', '/tʃiːt/', 'sheet', '/ʃiːt/'],
+          ],
+        },
+        {
+          id: 'j_y',
+          cat: 'c',
+          tab: 'dʒ / j',
+          a: { ipa: 'dʒ' },
+          b: { ipa: 'j' },
+          sub: 'Звонкая аффриката /dʒ/ против полугласного /j/',
+          diff: '/dʒ/ — звонкое «дж» со смычкой (jet). /j/ — мягкий «й» без смычки (yet).',
+          err: '/dʒ/ иногда заменяют на «й» или делают слишком твёрдым. Это слитное звонкое «дж».',
+          pairs: [
+            ['jet', '/dʒet/', 'yet', '/jet/'],
+            ['Jew', '/dʒuː/', 'you', '/juː/'],
+            ['joke', '/dʒəʊk/', 'yoke', '/jəʊk/'],
+            ['jam', '/dʒæm/', 'yam', '/jæm/'],
+            ['jeer', '/dʒɪə/', 'year', '/jɪə/'],
+            ['juice', '/dʒuːs/', 'use', '/juːs/'],
+          ],
+        },
+        {
+          id: 'h_zero',
+          cat: 'c',
+          tab: 'h / ∅',
+          a: { ipa: 'h' },
+          b: { ipa: '∅' },
+          head: '<span class="sa">/h/</span> <span class="vs">vs</span> <span class="sb">нет звука</span>',
+          sub: 'Наличие /h/ против его отсутствия в начале слова',
+          diff: '/h/ — лёгкий выдох в начале слова (heat). Без него слово начинается прямо с гласной (eat).',
+          err: 'Русскоговорящие часто не произносят /h/ или заменяют его жёстким «х». Английское /h/ — мягкий выдох, не «х».',
+          pairs: [
+            ['heat', '/hiːt/', 'eat', '/iːt/'],
+            ['hair', '/heə/', 'air', '/eə/'],
+            ['hold', '/həʊld/', 'old', '/əʊld/'],
+            ['harm', '/hɑːm/', 'arm', '/ɑːm/'],
+            ['high', '/haɪ/', 'I', '/aɪ/'],
+            ['hear', '/hɪə/', 'ear', '/ɪə/'],
+          ],
+        },
+        {
+          id: 'l_r',
+          cat: 'c',
+          tab: 'l / r',
+          a: { ipa: 'l' },
+          b: { ipa: 'r' },
+          sub: 'Боковой /l/ против /r/',
+          diff: '/l/ — кончик языка касается альвеол за зубами (light). /r/ — язык загнут назад, не касается нёба, губы чуть округлены (right).',
+          err: 'Английское /r/ не раскатистое: язык не вибрирует, как в русском «р».',
+          pairs: [
+            ['light', '/laɪt/', 'right', '/raɪt/'],
+            ['lead', '/liːd/', 'read', '/riːd/'],
+            ['long', '/lɒŋ/', 'wrong', '/rɒŋ/'],
+            ['glass', '/ɡlɑːs/', 'grass', '/ɡrɑːs/'],
+            ['play', '/pleɪ/', 'pray', '/preɪ/'],
+            ['lake', '/leɪk/', 'rake', '/reɪk/'],
+          ],
+        },
+        {
+          id: 'n_ng',
+          cat: 'c',
+          tab: 'n / ŋ',
+          a: { ipa: 'n' },
+          b: { ipa: 'ŋ' },
+          sub: 'Переднеязычный /n/ против заднеязычного /ŋ/',
+          diff: '/n/ — кончик языка у зубов (sin). /ŋ/ — задняя часть языка у мягкого нёба, носовой звук, как в окончании -ing (sing).',
+          err: 'После /ŋ/ добавляют /g/: sing → «синг». /ŋ/ — это один носовой звук без /g/ на конце.',
+          pairs: [
+            ['sin', '/sɪn/', 'sing', '/sɪŋ/'],
+            ['thin', '/θɪn/', 'thing', '/θɪŋ/'],
+            ['ban', '/bæn/', 'bang', '/bæŋ/'],
+            ['ran', '/ræn/', 'rang', '/ræŋ/'],
+            ['win', '/wɪn/', 'wing', '/wɪŋ/'],
+            ['ton', '/tʌn/', 'tongue', '/tʌŋ/'],
+          ],
+        },
+        {
+          id: 'm_n',
+          cat: 'c',
+          tab: 'm / n',
+          a: { ipa: 'm' },
+          b: { ipa: 'n' },
+          sub: 'Губной носовой /m/ против переднеязычного /n/',
+          diff: '/m/ — губы сомкнуты (might). /n/ — кончик языка у зубов, губы открыты (night). Оба носовые.',
+          err: 'На конце слова легко спутать. Следи: для /m/ губы должны сомкнуться, для /n/ — нет.',
+          pairs: [
+            ['might', '/maɪt/', 'night', '/naɪt/'],
+            ['sum', '/sʌm/', 'sun', '/sʌn/'],
+            ['ram', '/ræm/', 'ran', '/ræn/'],
+            ['map', '/mæp/', 'nap', '/næp/'],
+            ['mail', '/meɪl/', 'nail', '/neɪl/'],
+            ['team', '/tiːm/', 'teen', '/tiːn/'],
+          ],
+        },
+        {
+          id: 'final',
+          cat: 'c',
+          tab: 'звонкость',
+          a: { ipa: 'глух.' },
+          b: { ipa: 'звон.' },
+          sub: 'Оглушение в конце слова: глухой против звонкого',
+          diff: 'В русском звонкие согласные на конце оглушаются: «код» звучит как «кот». В английском это меняет слово: bag ≠ back. Звонкий согласный в конце (b, d, g, z, v) договаривают с голосом, а гласный перед ним делают длиннее.',
+          err: 'Русскоговорящие оглушают конец: bag → «бэк», prize → «прайс». Тяни гласную перед звонким согласным дольше и не «гаси» голос.',
+          pairs: [
+            ['cap', '/kæp/', 'cab', '/kæb/'],
+            ['bet', '/bet/', 'bed', '/bed/'],
+            ['back', '/bæk/', 'bag', '/bæɡ/'],
+            ['pick', '/pɪk/', 'pig', '/pɪɡ/'],
+            ['leaf', '/liːf/', 'leave', '/liːv/'],
+            ['safe', '/seɪf/', 'save', '/seɪv/'],
+            ['bus', '/bʌs/', 'buzz', '/bʌz/'],
+            ['price', '/praɪs/', 'prize', '/praɪz/'],
+          ],
+        },
+      ];
 
-    <div class="cnav" id="cnav"></div>
+      /* ---------------- speech ---------------- */
+      let voices = [],
+        voiceList = [],
+        chosenVoice = null,
+        slow = false;
+      const hasTTS = 'speechSynthesis' in window;
 
-    <div id="sections"></div>
-  </div>
+      function englishVoices() {
+        return voices.filter((v) => v.lang && v.lang.toLowerCase().startsWith('en'));
+      }
+      function plural(n, one, few, many) {
+        const m = n % 100,
+          d = n % 10;
+        if (m >= 11 && m <= 14) return many;
+        if (d === 1) return one;
+        if (d >= 2 && d <= 4) return few;
+        return many;
+      }
+      function voiceLabel(v) {
+        let name = v.name
+          .replace(/Microsoft|Google|Online|\(Natural\)|Desktop/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return (name || v.name) + ' · ' + (v.lang || '') + (v.localService ? '' : ' ☁');
+      }
+      function buildVoiceList() {
+        const sel = document.getElementById('voiceSelect');
+        if (!sel) return;
+        const en = englishVoices();
+        voiceList = en.length ? en : voices;
+        const prevURI = chosenVoice ? chosenVoice.voiceURI : null;
+        sel.innerHTML = voiceList.map((v, i) => `<option value="${i}">${voiceLabel(v)}</option>`).join('');
+        let idx = voiceList.findIndex((v) => v.voiceURI === prevURI);
+        if (idx < 0) idx = voiceList.findIndex((v) => /en[-_]US/i.test(v.lang));
+        if (idx < 0) idx = voiceList.length ? 0 : -1;
+        chosenVoice = idx >= 0 ? voiceList[idx] : null;
+        if (idx >= 0) sel.value = String(idx);
+        updateVoiceState();
+      }
+      function loadVoices() {
+        if (hasTTS) {
+          voices = speechSynthesis.getVoices();
+          buildVoiceList();
+        }
+      }
+      if (hasTTS) {
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+      } else {
+        document.getElementById('nosound').style.display = 'block';
+        document.getElementById('voiceState').textContent = 'нет синтеза речи';
+        document.getElementById('voiceState').classList.add('bad');
+      }
 
-</div>
+      function updateVoiceState() {
+        const el = document.getElementById('voiceState');
+        if (!hasTTS) return;
+        const n = englishVoices().length;
+        if (n > 0) {
+          el.textContent = '🔊 ' + n + ' ' + plural(n, 'голос', 'голоса', 'голосов');
+          el.classList.remove('bad');
+        } else if (voices.length) {
+          el.textContent = 'нет англ. голосов — выбери из списка';
+          el.classList.remove('bad');
+        } else {
+          el.textContent = 'голоса загружаются…';
+        }
+      }
+      function speak(word, el) {
+        if (!hasTTS) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(word);
+        if (chosenVoice) {
+          u.voice = chosenVoice;
+          u.lang = chosenVoice.lang;
+        } else {
+          u.lang = 'en-US';
+        }
+        u.rate = slow ? 0.55 : 0.92;
+        u.pitch = 1;
+        if (el) {
+          u.onstart = () => el.classList.add('speaking');
+          u.onend = () => el.classList.remove('speaking');
+          u.onerror = () => el.classList.remove('speaking');
+        }
+        speechSynthesis.speak(u);
+      }
+      const _vsel = document.getElementById('voiceSelect');
+      if (_vsel)
+        _vsel.addEventListener('change', () => {
+          chosenVoice = voiceList[+_vsel.value] || null;
+          updateVoiceState();
+        });
 
-<script>
-/* ---------------- data ---------------- */
-const CONTRASTS = [
-  // ===== ГЛАСНЫЕ =====
-  {
-    id:'i', cat:'v', tab:'ɪ / iː',
-    a:{ipa:'ɪ'}, b:{ipa:'iː'},
-    sub:'Короткий расслабленный /ɪ/ против долгого напряжённого /iː/',
-    diff:'Разница не только в долготе. /ɪ/ — язык ниже и расслаблен, звук между русскими «и» и «ы» (sit). /iː/ — язык высоко и вперёд, мышцы напряжены, губы слегка растянуты, как в улыбке (seat). Долгота — лишь следствие.',
-    err:'Русскоговорящие произносят оба звука как русское «и», и ship превращается в sheep. Запомни: /ɪ/ — короткий и «ленивый», /iː/ — длинный и «улыбающийся».',
-    pairs:[['ship','/ʃɪp/','sheep','/ʃiːp/'],['bit','/bɪt/','beat','/biːt/'],['fit','/fɪt/','feet','/fiːt/'],['chip','/tʃɪp/','cheap','/tʃiːp/'],['fill','/fɪl/','feel','/fiːl/'],['rich','/rɪtʃ/','reach','/riːtʃ/'],['sit','/sɪt/','seat','/siːt/'],['hit','/hɪt/','heat','/hiːt/']]
-  },
-  {
-    id:'ae_e', cat:'v', tab:'æ / e',
-    a:{ipa:'æ'}, b:{ipa:'e'},
-    sub:'Широкое открытое /æ/ против узкого /e/',
-    diff:'/æ/ — рот открыт широко, челюсть опущена, язык плоский и низкий впереди (cat). /e/ — рот приоткрыт меньше, язык чуть выше, звук как русское «э» в «эти» (bed). Главное — насколько широко открыт рот.',
-    err:'Оба звука часто заменяют русским «э», поэтому bad и bed звучат одинаково. Чтобы получить /æ/, опусти челюсть сильнее, будто говоришь «э» и одновременно зеваешь.',
-    pairs:[['bad','/bæd/','bed','/bed/'],['man','/mæn/','men','/men/'],['sat','/sæt/','set','/set/'],['bat','/bæt/','bet','/bet/'],['had','/hæd/','head','/hed/'],['pan','/pæn/','pen','/pen/'],['gas','/ɡæs/','guess','/ɡes/'],['and','/ænd/','end','/end/']]
-  },
-  {
-    id:'ae_uh', cat:'v', tab:'æ / ʌ',
-    a:{ipa:'æ'}, b:{ipa:'ʌ'},
-    sub:'Переднее открытое /æ/ против центрального /ʌ/',
-    diff:'/æ/ — звук впереди рта, рот широкий, как «э» с опущенной челюстью (cat). /ʌ/ — звук в центре рта, короткий и тусклый, ближе к русскому «а» в безударном слоге (cut). Это разные точки: перёд против центра.',
-    err:'/ʌ/ часто тянут как русское «а», а /æ/ делают тем же «а» — и cat сливается с cut. Держи /æ/ впереди и широким, а /ʌ/ — коротким и нейтральным.',
-    pairs:[['cat','/kæt/','cut','/kʌt/'],['cap','/kæp/','cup','/kʌp/'],['ran','/ræn/','run','/rʌn/'],['match','/mætʃ/','much','/mʌtʃ/'],['bat','/bæt/','but','/bʌt/'],['fan','/fæn/','fun','/fʌn/'],['bag','/bæɡ/','bug','/bʌɡ/'],['ankle','/ˈæŋkl/','uncle','/ˈʌŋkl/']]
-  },
-  {
-    id:'uh_ar', cat:'v', tab:'ʌ / ɑː',
-    a:{ipa:'ʌ'}, b:{ipa:'ɑː'},
-    sub:'Короткий центральный /ʌ/ против долгого заднего /ɑː/',
-    diff:'/ʌ/ — короткий, в центре рта (cut). /ɑː/ — долгий, рот шире, звук «глубже» и идёт из задней части (cart). В американском в cart слышно r на конце.',
-    err:'Оба тянут как русское «а». Сделай /ʌ/ коротким и нейтральным, а /ɑː/ — заметно длиннее и «темнее».',
-    pairs:[['cut','/kʌt/','cart','/kɑːt/'],['luck','/lʌk/','lark','/lɑːk/'],['bun','/bʌn/','barn','/bɑːn/'],['hut','/hʌt/','heart','/hɑːt/'],['come','/kʌm/','calm','/kɑːm/'],['duck','/dʌk/','dark','/dɑːk/']]
-  },
-  {
-    id:'o_or', cat:'v', tab:'ɒ / ɔː',
-    a:{ipa:'ɒ'}, b:{ipa:'ɔː'},
-    sub:'Короткий округлённый /ɒ/ против долгого /ɔː/',
-    diff:'/ɒ/ — короткий округлённый гласный (hot). /ɔː/ — долгий, губы сильнее округлены (saw). В американском /ɒ/ обычно сливается с /ɑː/, а в словах с r (port, short) слышно r.',
-    err:'Главное — длина и округление. /ɔː/ заметно дольше и «полнее».',
-    pairs:[['cot','/kɒt/','caught','/kɔːt/'],['don','/dɒn/','dawn','/dɔːn/'],['shot','/ʃɒt/','short','/ʃɔːt/'],['cod','/kɒd/','cord','/kɔːd/'],['pot','/pɒt/','port','/pɔːt/'],['spot','/spɒt/','sport','/spɔːt/']]
-  },
-  {
-    id:'u_uu', cat:'v', tab:'ʊ / uː',
-    a:{ipa:'ʊ'}, b:{ipa:'uː'},
-    sub:'Короткий расслабленный /ʊ/ против долгого /uː/',
-    diff:'/ʊ/ — короткий, губы расслаблены (book). /uː/ — долгий, губы сильно округлены в трубочку (boot).',
-    err:'Оба произносят как русское «у». Сделай /ʊ/ коротким и расслабленным, а /uː/ — долгим, с губами в плотную трубочку.',
-    pairs:[['full','/fʊl/','fool','/fuːl/'],['pull','/pʊl/','pool','/puːl/'],['look','/lʊk/','Luke','/luːk/'],['soot','/sʊt/','suit','/suːt/'],['could','/kʊd/','cooed','/kuːd/'],['wood','/wʊd/','wooed','/wuːd/']]
-  },
-  {
-    id:'er_or', cat:'v', tab:'ɜː / ɔː',
-    a:{ipa:'ɜː'}, b:{ipa:'ɔː'},
-    sub:'Центральный /ɜː/ против заднего округлённого /ɔː/',
-    diff:'/ɜː/ — долгий нейтральный звук в центре рта, губы не округлены (bird). /ɔː/ — долгий, губы округлены, звук идёт из задней части (board). В американском оба часто звучат с r-окраской.',
-    err:'/ɜː/ путают с русским «ё/о» и округляют губы. Держи губы нейтральными, без округления.',
-    pairs:[['bird','/bɜːd/','board','/bɔːd/'],['shirt','/ʃɜːt/','short','/ʃɔːt/'],['word','/wɜːd/','ward','/wɔːd/'],['fur','/fɜː/','four','/fɔː/'],['stir','/stɜː/','store','/stɔː/'],['burn','/bɜːn/','born','/bɔːn/']]
-  },
-  {
-    id:'ei_e', cat:'v', tab:'eɪ / e',
-    a:{ipa:'eɪ'}, b:{ipa:'e'},
-    sub:'Дифтонг /eɪ/ против короткого монофтонга /e/',
-    diff:'/eɪ/ — скольжение от «э» к «и» («эй»), долгий (late). /e/ — короткий монофтонг, без движения (let).',
-    err:'/eɪ/ нельзя произносить как короткое «э». Это «эй» с явным скольжением вверх.',
-    pairs:[['late','/leɪt/','let','/let/'],['pain','/peɪn/','pen','/pen/'],['tale','/teɪl/','tell','/tel/'],['main','/meɪn/','men','/men/'],['raid','/reɪd/','red','/red/'],['wait','/weɪt/','wet','/wet/']]
-  },
-  {
-    id:'ou_or', cat:'v', tab:'əʊ / ɔː',
-    a:{ipa:'əʊ'}, b:{ipa:'ɔː'},
-    sub:'Дифтонг /əʊ/ против долгого /ɔː/',
-    diff:'/əʊ/ — скольжение от нейтрального «ə» к «у» («оу»), есть движение (boat). /ɔː/ — долгий монофтонг, без движения (bought). В американском /əʊ/ звучит как /oʊ/ — губы круглее.',
-    err:'/əʊ/ часто путают с /ɔː/ или делают слишком закруглённым русским «оу». Начинай с нейтрального звука.',
-    pairs:[['so','/səʊ/','saw','/sɔː/'],['low','/ləʊ/','law','/lɔː/'],['boat','/bəʊt/','bought','/bɔːt/'],['coat','/kəʊt/','caught','/kɔːt/'],['phone','/fəʊn/','fawn','/fɔːn/'],['bowl','/bəʊl/','ball','/bɔːl/']]
-  },
-  {
-    id:'ai_ei', cat:'v', tab:'aɪ / eɪ',
-    a:{ipa:'aɪ'}, b:{ipa:'eɪ'},
-    sub:'Дифтонг /aɪ/ против дифтонга /eɪ/',
-    diff:'/aɪ/ — «ай» (от открытого «а» к «и»). /eɪ/ — «эй» (от «э» к «и»). Разные стартовые точки скольжения.',
-    err:'Путают начало дифтонга. /aɪ/ стартует с широкого открытого «а».',
-    pairs:[['buy','/baɪ/','bay','/beɪ/'],['lie','/laɪ/','lay','/leɪ/'],['my','/maɪ/','may','/meɪ/'],['ride','/raɪd/','raid','/reɪd/'],['die','/daɪ/','day','/deɪ/'],['wine','/waɪn/','wane','/weɪn/']]
-  },
-  {
-    id:'au_ou', cat:'v', tab:'aʊ / əʊ',
-    a:{ipa:'aʊ'}, b:{ipa:'əʊ'},
-    sub:'Дифтонг /aʊ/ против дифтонга /əʊ/',
-    diff:'/aʊ/ — «ау» (от открытого «а» к «у»). /əʊ/ — «оу» (от нейтрального «ə» к «у»). Разница в стартовой гласной.',
-    err:'Оба сводят к похожему «а/о». /aʊ/ начинается с явного открытого «а».',
-    pairs:[['now','/naʊ/','no','/nəʊ/'],['loud','/laʊd/','load','/ləʊd/'],['town','/taʊn/','tone','/təʊn/'],['found','/faʊnd/','phoned','/fəʊnd/'],['doubt','/daʊt/','dote','/dəʊt/'],['bout','/baʊt/','boat','/bəʊt/']]
-  },
-  {
-    id:'oi_ai', cat:'v', tab:'ɔɪ / aɪ',
-    a:{ipa:'ɔɪ'}, b:{ipa:'aɪ'},
-    sub:'Дифтонг /ɔɪ/ против дифтонга /aɪ/',
-    diff:'/ɔɪ/ — «ой» (от округлённого «о» к «и»). /aɪ/ — «ай» (от открытого «а» к «и»). Разное начало.',
-    err:'Слушай стартовую гласную: округлённое «о» против широкого «а».',
-    pairs:[['boy','/bɔɪ/','buy','/baɪ/'],['toy','/tɔɪ/','tie','/taɪ/'],['oil','/ɔɪl/','aisle','/aɪl/'],['boil','/bɔɪl/','bile','/baɪl/'],['voice','/vɔɪs/','vice','/vaɪs/'],['Roy','/rɔɪ/','rye','/raɪ/']]
-  },
-  {
-    id:'ear_air', cat:'v', tab:'ɪə / eə',
-    a:{ipa:'ɪə'}, b:{ipa:'eə'},
-    sub:'Центрирующий дифтонг /ɪə/ против /eə/',
-    diff:'/ɪə/ начинается с «и» и скользит к нейтральному «ə» (here). /eə/ начинается с «э» (hair). В американском оба идут с r: /ɪr/ и /er/.',
-    err:'Оба сводят к «эа». Слушай стартовую гласную: «и» против «э».',
-    pairs:[['beer','/bɪə/','bear','/beə/'],['here','/hɪə/','hair','/heə/'],['fear','/fɪə/','fair','/feə/'],['ear','/ɪə/','air','/eə/'],['cheer','/tʃɪə/','chair','/tʃeə/'],['really','/ˈrɪəli/','rarely','/ˈreəli/']]
-  },
-  // ===== СОГЛАСНЫЕ =====
-  {
-    id:'th_s', cat:'c', tab:'θ / s',
-    a:{ipa:'θ'}, b:{ipa:'s'},
-    sub:'Межзубный /θ/ против свистящего /s/',
-    diff:'/θ/ — кончик языка между зубами, воздух идёт поверх языка (think). /s/ — язык за верхними зубами, узкая струя воздуха даёт свист (sink).',
-    err:'В русском нет /θ/, поэтому его заменяют на /s/, /t/ или /f/. Просунь кончик языка между зубами и подуй.',
-    pairs:[['think','/θɪŋk/','sink','/sɪŋk/'],['thick','/θɪk/','sick','/sɪk/'],['thing','/θɪŋ/','sing','/sɪŋ/'],['mouth','/maʊθ/','mouse','/maʊs/'],['path','/pɑːθ/','pass','/pɑːs/'],['thumb','/θʌm/','sum','/sʌm/'],['theme','/θiːm/','seem','/siːm/'],['worth','/wɜːθ/','worse','/wɜːs/']]
-  },
-  {
-    id:'th_d', cat:'c', tab:'ð / d·z',
-    a:{ipa:'ð'}, b:{ipa:'d/z'},
-    sub:'Звонкий межзубный /ð/ против /d/ и /z/',
-    diff:'/ð/ — язык между зубами, но с голосом, связки вибрируют (they, this). /d/ делается языком за зубами, /z/ — свист с голосом.',
-    err:'/ð/ заменяют на /d/ («дей») или /z/ («бразер»). Поставь язык между зубами и включи голос.',
-    pairs:[['they','/ðeɪ/','day','/deɪ/'],['then','/ðen/','den','/den/'],['though','/ðəʊ/','dough','/dəʊ/'],['there','/ðeə/','dare','/deə/'],['than','/ðæn/','Dan','/dæn/'],['breathe','/briːð/','breeze','/briːz/'],['those','/ðəʊz/','doze','/dəʊz/'],['bathe','/beɪð/','bays','/beɪz/']]
-  },
-  {
-    id:'w_v', cat:'c', tab:'w / v',
-    a:{ipa:'w'}, b:{ipa:'v'},
-    sub:'Губной /w/ против губно-зубного /v/',
-    diff:'/w/ — губы округлены и не касаются зубов, звук как «у» в начале (wine). /v/ — нижняя губа касается верхних зубов, как русское «в» (vine).',
-    err:'Русское «в» ставят на оба звука. Для /w/ убери зубы от губы и округли губы, как для «у».',
-    pairs:[['wine','/waɪn/','vine','/vaɪn/'],['west','/west/','vest','/vest/'],['wail','/weɪl/','veil','/veɪl/'],['worse','/wɜːs/','verse','/vɜːs/'],['wary','/ˈweəri/','vary','/ˈveəri/'],['wet','/wet/','vet','/vet/'],['while','/waɪl/','vile','/vaɪl/']]
-  },
-  {
-    id:'s_sh', cat:'c', tab:'s / ʃ',
-    a:{ipa:'s'}, b:{ipa:'ʃ'},
-    sub:'Свистящий /s/ против шипящего /ʃ/',
-    diff:'/s/ — язык за зубами, узкий свист (sip). /ʃ/ — язык отодвинут назад, губы чуть округлены, мягкое «ш» (ship).',
-    err:'Английское /ʃ/ мягче русского «ш», ближе к «щ». Не делай его слишком твёрдым.',
-    pairs:[['sip','/sɪp/','ship','/ʃɪp/'],['sea','/siː/','she','/ʃiː/'],['sue','/suː/','shoe','/ʃuː/'],['save','/seɪv/','shave','/ʃeɪv/'],['mass','/mæs/','mash','/mæʃ/'],['sock','/sɒk/','shock','/ʃɒk/']]
-  },
-  {
-    id:'ch_sh', cat:'c', tab:'tʃ / ʃ',
-    a:{ipa:'tʃ'}, b:{ipa:'ʃ'},
-    sub:'Аффриката /tʃ/ против фрикативного /ʃ/',
-    diff:'/tʃ/ начинается со смычки и взрыва, как «тш» (chip). /ʃ/ — чистый «ш» без смычки (ship).',
-    err:'Путают «ч» и «ш». В /tʃ/ есть короткий взрыв в самом начале, в /ʃ/ его нет.',
-    pairs:[['chip','/tʃɪp/','ship','/ʃɪp/'],['chair','/tʃeə/','share','/ʃeə/'],['chop','/tʃɒp/','shop','/ʃɒp/'],['watch','/wɒtʃ/','wash','/wɒʃ/'],['catch','/kætʃ/','cash','/kæʃ/'],['cheat','/tʃiːt/','sheet','/ʃiːt/']]
-  },
-  {
-    id:'j_y', cat:'c', tab:'dʒ / j',
-    a:{ipa:'dʒ'}, b:{ipa:'j'},
-    sub:'Звонкая аффриката /dʒ/ против полугласного /j/',
-    diff:'/dʒ/ — звонкое «дж» со смычкой (jet). /j/ — мягкий «й» без смычки (yet).',
-    err:'/dʒ/ иногда заменяют на «й» или делают слишком твёрдым. Это слитное звонкое «дж».',
-    pairs:[['jet','/dʒet/','yet','/jet/'],['Jew','/dʒuː/','you','/juː/'],['joke','/dʒəʊk/','yoke','/jəʊk/'],['jam','/dʒæm/','yam','/jæm/'],['jeer','/dʒɪə/','year','/jɪə/'],['juice','/dʒuːs/','use','/juːs/']]
-  },
-  {
-    id:'h_zero', cat:'c', tab:'h / ∅',
-    a:{ipa:'h'}, b:{ipa:'∅'},
-    head:'<span class="sa">/h/</span> <span class="vs">vs</span> <span class="sb">нет звука</span>',
-    sub:'Наличие /h/ против его отсутствия в начале слова',
-    diff:'/h/ — лёгкий выдох в начале слова (heat). Без него слово начинается прямо с гласной (eat).',
-    err:'Русскоговорящие часто не произносят /h/ или заменяют его жёстким «х». Английское /h/ — мягкий выдох, не «х».',
-    pairs:[['heat','/hiːt/','eat','/iːt/'],['hair','/heə/','air','/eə/'],['hold','/həʊld/','old','/əʊld/'],['harm','/hɑːm/','arm','/ɑːm/'],['high','/haɪ/','I','/aɪ/'],['hear','/hɪə/','ear','/ɪə/']]
-  },
-  {
-    id:'l_r', cat:'c', tab:'l / r',
-    a:{ipa:'l'}, b:{ipa:'r'},
-    sub:'Боковой /l/ против /r/',
-    diff:'/l/ — кончик языка касается альвеол за зубами (light). /r/ — язык загнут назад, не касается нёба, губы чуть округлены (right).',
-    err:'Английское /r/ не раскатистое: язык не вибрирует, как в русском «р».',
-    pairs:[['light','/laɪt/','right','/raɪt/'],['lead','/liːd/','read','/riːd/'],['long','/lɒŋ/','wrong','/rɒŋ/'],['glass','/ɡlɑːs/','grass','/ɡrɑːs/'],['play','/pleɪ/','pray','/preɪ/'],['lake','/leɪk/','rake','/reɪk/']]
-  },
-  {
-    id:'n_ng', cat:'c', tab:'n / ŋ',
-    a:{ipa:'n'}, b:{ipa:'ŋ'},
-    sub:'Переднеязычный /n/ против заднеязычного /ŋ/',
-    diff:'/n/ — кончик языка у зубов (sin). /ŋ/ — задняя часть языка у мягкого нёба, носовой звук, как в окончании -ing (sing).',
-    err:'После /ŋ/ добавляют /g/: sing → «синг». /ŋ/ — это один носовой звук без /g/ на конце.',
-    pairs:[['sin','/sɪn/','sing','/sɪŋ/'],['thin','/θɪn/','thing','/θɪŋ/'],['ban','/bæn/','bang','/bæŋ/'],['ran','/ræn/','rang','/ræŋ/'],['win','/wɪn/','wing','/wɪŋ/'],['ton','/tʌn/','tongue','/tʌŋ/']]
-  },
-  {
-    id:'m_n', cat:'c', tab:'m / n',
-    a:{ipa:'m'}, b:{ipa:'n'},
-    sub:'Губной носовой /m/ против переднеязычного /n/',
-    diff:'/m/ — губы сомкнуты (might). /n/ — кончик языка у зубов, губы открыты (night). Оба носовые.',
-    err:'На конце слова легко спутать. Следи: для /m/ губы должны сомкнуться, для /n/ — нет.',
-    pairs:[['might','/maɪt/','night','/naɪt/'],['sum','/sʌm/','sun','/sʌn/'],['ram','/ræm/','ran','/ræn/'],['map','/mæp/','nap','/næp/'],['mail','/meɪl/','nail','/neɪl/'],['team','/tiːm/','teen','/tiːn/']]
-  },
-  {
-    id:'final', cat:'c', tab:'звонкость',
-    a:{ipa:'глух.'}, b:{ipa:'звон.'},
-    sub:'Оглушение в конце слова: глухой против звонкого',
-    diff:'В русском звонкие согласные на конце оглушаются: «код» звучит как «кот». В английском это меняет слово: bag ≠ back. Звонкий согласный в конце (b, d, g, z, v) договаривают с голосом, а гласный перед ним делают длиннее.',
-    err:'Русскоговорящие оглушают конец: bag → «бэк», prize → «прайс». Тяни гласную перед звонким согласным дольше и не «гаси» голос.',
-    pairs:[['cap','/kæp/','cab','/kæb/'],['bet','/bet/','bed','/bed/'],['back','/bæk/','bag','/bæɡ/'],['pick','/pɪk/','pig','/pɪɡ/'],['leaf','/liːf/','leave','/liːv/'],['safe','/seɪf/','save','/seɪv/'],['bus','/bʌs/','buzz','/bʌz/'],['price','/praɪs/','prize','/praɪz/']]
-  }
-];
+      /* ---------------- build UI ---------------- */
+      const cnav = document.getElementById('cnav'),
+        sections = document.getElementById('sections');
+      const quizState = {};
 
-/* ---------------- speech ---------------- */
-let voices=[], voiceList=[], chosenVoice=null, slow=false;
-const hasTTS = 'speechSynthesis' in window;
+      let lastCat = null;
+      CONTRASTS.forEach((c, idx) => {
+        // nav category label
+        if (c.cat !== lastCat) {
+          const lab = document.createElement('span');
+          lab.className = 'cgroup';
+          lab.textContent = c.cat === 'v' ? 'Гласные' : 'Согласные';
+          cnav.appendChild(lab);
+          lastCat = c.cat;
+        }
+        const nb = document.createElement('button');
+        nb.innerHTML = c.tab;
+        nb.dataset.target = c.id;
+        if (idx === 0) nb.classList.add('active');
+        nb.onclick = () => showContrast(c.id);
+        cnav.appendChild(nb);
 
-function englishVoices(){ return voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith('en')); }
-function plural(n,one,few,many){ const m=n%100, d=n%10;
-  if(m>=11&&m<=14) return many; if(d===1) return one; if(d>=2&&d<=4) return few; return many; }
-function voiceLabel(v){
-  let name=v.name.replace(/Microsoft|Google|Online|\(Natural\)|Desktop/g,'').replace(/\s+/g,' ').trim();
-  return (name||v.name)+' · '+(v.lang||'')+(v.localService?'':' ☁');
-}
-function buildVoiceList(){
-  const sel=document.getElementById('voiceSelect'); if(!sel) return;
-  const en=englishVoices();
-  voiceList = en.length ? en : voices;
-  const prevURI = chosenVoice ? chosenVoice.voiceURI : null;
-  sel.innerHTML = voiceList.map((v,i)=>`<option value="${i}">${voiceLabel(v)}</option>`).join('');
-  let idx = voiceList.findIndex(v=>v.voiceURI===prevURI);
-  if(idx<0) idx = voiceList.findIndex(v=>/en[-_]US/i.test(v.lang));
-  if(idx<0) idx = voiceList.length ? 0 : -1;
-  chosenVoice = idx>=0 ? voiceList[idx] : null;
-  if(idx>=0) sel.value=String(idx);
-  updateVoiceState();
-}
-function loadVoices(){ if(hasTTS){ voices = speechSynthesis.getVoices(); buildVoiceList(); } }
-if(hasTTS){ loadVoices(); if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoices; }
-else { document.getElementById('nosound').style.display='block'; document.getElementById('voiceState').textContent='нет синтеза речи'; document.getElementById('voiceState').classList.add('bad'); }
+        // section
+        const sec = document.createElement('div');
+        sec.className = 'contrast' + (idx === 0 ? ' show' : '');
+        sec.id = 'sec-' + c.id;
 
-function updateVoiceState(){
-  const el=document.getElementById('voiceState'); if(!hasTTS) return;
-  const n=englishVoices().length;
-  if(n>0){ el.textContent='🔊 '+n+' '+plural(n,'голос','голоса','голосов'); el.classList.remove('bad'); }
-  else if(voices.length){ el.textContent='нет англ. голосов — выбери из списка'; el.classList.remove('bad'); }
-  else { el.textContent='голоса загружаются…'; }
-}
-function speak(word, el){
-  if(!hasTTS) return;
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(word);
-  if(chosenVoice){ u.voice=chosenVoice; u.lang=chosenVoice.lang; } else { u.lang='en-US'; }
-  u.rate = slow?0.55:0.92; u.pitch=1;
-  if(el){ u.onstart=()=>el.classList.add('speaking'); u.onend=()=>el.classList.remove('speaking'); u.onerror=()=>el.classList.remove('speaking'); }
-  speechSynthesis.speak(u);
-}
-const _vsel=document.getElementById('voiceSelect');
-if(_vsel) _vsel.addEventListener('change', ()=>{ chosenVoice=voiceList[+_vsel.value]||null; updateVoiceState(); });
-
-/* ---------------- build UI ---------------- */
-const cnav=document.getElementById('cnav'), sections=document.getElementById('sections');
-const quizState={};
-
-let lastCat=null;
-CONTRASTS.forEach((c,idx)=>{
-  // nav category label
-  if(c.cat!==lastCat){
-    const lab=document.createElement('span');
-    lab.className='cgroup';
-    lab.textContent = c.cat==='v' ? 'Гласные' : 'Согласные';
-    cnav.appendChild(lab);
-    lastCat=c.cat;
-  }
-  const nb=document.createElement('button');
-  nb.innerHTML=c.tab; nb.dataset.target=c.id; if(idx===0) nb.classList.add('active');
-  nb.onclick=()=>showContrast(c.id);
-  cnav.appendChild(nb);
-
-  // section
-  const sec=document.createElement('div');
-  sec.className='contrast'+(idx===0?' show':''); sec.id='sec-'+c.id;
-
-  let pairsHTML='';
-  c.pairs.forEach((p,pi)=>{
-    pairsHTML+=`<div class="pair-row">
+        let pairsHTML = '';
+        c.pairs.forEach((p, pi) => {
+          pairsHTML += `<div class="pair-row">
       <div class="word a" data-word="${p[0]}"><span class="w">${p[0]}</span><span class="ipa">${p[1]}</span></div>
       <div class="both"><button data-both="${c.id}:${pi}" title="Проиграть оба">⇄</button></div>
       <div class="word b" data-word="${p[2]}"><span class="w">${p[2]}</span><span class="ipa">${p[3]}</span></div>
     </div>`;
-  });
+        });
 
-  sec.innerHTML=`
+        sec.innerHTML = `
     <div class="c-head"><h2>${c.head || `<span class="sa">/${c.a.ipa}/</span> <span class="vs">vs</span> <span class="sb">/${c.b.ipa}/</span>`}</h2></div>
     <p class="c-sub">${c.sub}</p>
     <div class="note diff"><h4>В чём разница</h4>${c.diff}</div>
@@ -556,176 +1373,224 @@ CONTRASTS.forEach((c,idx)=>{
     </div>
     <div class="tip"><b>Совет.</b> Сначала прогони пары глазами и ушами 2–3 раза, потом переходи к тренировке. Цель — узнавать звук <i>до</i> того, как посмотришь на написание. 5 минут в день эффективнее, чем час раз в неделю.</div>
   `;
-  sections.appendChild(sec);
-  quizState[c.id]={correct:0,total:0,current:null,answered:true};
-});
+        sections.appendChild(sec);
+        quizState[c.id] = { correct: 0, total: 0, current: null, answered: true };
+      });
 
-function showContrast(id){
-  document.querySelectorAll('.contrast').forEach(s=>s.classList.toggle('show', s.id==='sec-'+id));
-  document.querySelectorAll('.cnav button').forEach(b=>b.classList.toggle('active', b.dataset.target===id));
-  window.scrollTo({top:document.querySelector('.cnav').offsetTop-70, behavior:'smooth'});
-}
+      function showContrast(id) {
+        document.querySelectorAll('.contrast').forEach((s) => s.classList.toggle('show', s.id === 'sec-' + id));
+        document.querySelectorAll('.cnav button').forEach((b) => b.classList.toggle('active', b.dataset.target === id));
+        window.scrollTo({ top: document.querySelector('.cnav').offsetTop - 70, behavior: 'smooth' });
+      }
 
-/* ---- delegated clicks: words + play-both ---- */
-sections.addEventListener('click', e=>{
-  const w=e.target.closest('.word[data-word]');
-  if(w){ speak(w.dataset.word, w); return; }
-  const bo=e.target.closest('[data-both]');
-  if(bo){
-    const [cid,pi]=bo.dataset.both.split(':'); const c=CONTRASTS.find(x=>x.id===cid); const p=c.pairs[+pi];
-    const wa=bo.closest('.pair-row').querySelector('.word.a'); const wb=bo.closest('.pair-row').querySelector('.word.b');
-    speak(p[0],wa); setTimeout(()=>speak(p[2],wb), slow?1500:1000); return;
-  }
-  const play=e.target.closest('[data-play]'); if(play){ newQuestion(play.dataset.play); return; }
-  const rep=e.target.closest('[data-replay]'); if(rep){ replay(rep.dataset.replay); return; }
-});
+      /* ---- delegated clicks: words + play-both ---- */
+      sections.addEventListener('click', (e) => {
+        const w = e.target.closest('.word[data-word]');
+        if (w) {
+          speak(w.dataset.word, w);
+          return;
+        }
+        const bo = e.target.closest('[data-both]');
+        if (bo) {
+          const [cid, pi] = bo.dataset.both.split(':');
+          const c = CONTRASTS.find((x) => x.id === cid);
+          const p = c.pairs[+pi];
+          const wa = bo.closest('.pair-row').querySelector('.word.a');
+          const wb = bo.closest('.pair-row').querySelector('.word.b');
+          speak(p[0], wa);
+          setTimeout(() => speak(p[2], wb), slow ? 1500 : 1000);
+          return;
+        }
+        const play = e.target.closest('[data-play]');
+        if (play) {
+          newQuestion(play.dataset.play);
+          return;
+        }
+        const rep = e.target.closest('[data-replay]');
+        if (rep) {
+          replay(rep.dataset.replay);
+          return;
+        }
+      });
 
-/* ---- quiz logic ---- */
-function newQuestion(cid){
-  const c=CONTRASTS.find(x=>x.id===cid); const st=quizState[cid];
-  const pi=Math.floor(Math.random()*c.pairs.length);
-  const which=Math.random()<0.5?0:1;           // 0 => word a, 1 => word b
-  const p=c.pairs[pi];
-  st.current={pi, which, wordA:p[0], wordB:p[2]};
-  st.answered=false;
-  const wrap=document.getElementById('qbtns-'+cid);
-  wrap.className='qbtns'; wrap.innerHTML=
-    `<button class="opt oa" data-pick="0">${p[0]}</button>
+      /* ---- quiz logic ---- */
+      function newQuestion(cid) {
+        const c = CONTRASTS.find((x) => x.id === cid);
+        const st = quizState[cid];
+        const pi = Math.floor(Math.random() * c.pairs.length);
+        const which = Math.random() < 0.5 ? 0 : 1; // 0 => word a, 1 => word b
+        const p = c.pairs[pi];
+        st.current = { pi, which, wordA: p[0], wordB: p[2] };
+        st.answered = false;
+        const wrap = document.getElementById('qbtns-' + cid);
+        wrap.className = 'qbtns';
+        wrap.innerHTML = `<button class="opt oa" data-pick="0">${p[0]}</button>
      <button class="opt ob" data-pick="1">${p[2]}</button>`;
-  wrap.querySelectorAll('.opt').forEach(o=>o.onclick=()=>answer(cid, +o.dataset.pick, o));
-  document.getElementById('fb-'+cid).textContent='';
-  speak(which===0?p[0]:p[2]);
-}
-function replay(cid){
-  const st=quizState[cid]; if(!st.current){ newQuestion(cid); return; }
-  speak(st.current.which===0?st.current.wordA:st.current.wordB);
-}
-function answer(cid, pick, el){
-  const st=quizState[cid]; if(st.answered||!st.current) return;
-  st.answered=true; st.total++;
-  const correct = pick===st.current.which;
-  if(correct) st.correct++;
-  const wrap=document.getElementById('qbtns-'+cid); wrap.classList.add('locked');
-  const opts=wrap.querySelectorAll('.opt');
-  opts[st.current.which].classList.add('correct');
-  if(!correct) el.classList.add('wrong');
-  const fb=document.getElementById('fb-'+cid);
-  const heard = st.current.which===0?st.current.wordA:st.current.wordB;
-  if(correct){ fb.textContent='✓ Верно — это было «'+heard+'».'; fb.className='feedback ok'; }
-  else { fb.textContent='✗ Нет, прозвучало «'+heard+'». Нажми ↻ и послушай ещё раз.'; fb.className='feedback no'; }
-  document.getElementById('score-'+cid).innerHTML='Счёт: <b>'+st.correct+'</b> / '+st.total;
-}
+        wrap.querySelectorAll('.opt').forEach((o) => (o.onclick = () => answer(cid, +o.dataset.pick, o)));
+        document.getElementById('fb-' + cid).textContent = '';
+        speak(which === 0 ? p[0] : p[2]);
+      }
+      function replay(cid) {
+        const st = quizState[cid];
+        if (!st.current) {
+          newQuestion(cid);
+          return;
+        }
+        speak(st.current.which === 0 ? st.current.wordA : st.current.wordB);
+      }
+      function answer(cid, pick, el) {
+        const st = quizState[cid];
+        if (st.answered || !st.current) return;
+        st.answered = true;
+        st.total++;
+        const correct = pick === st.current.which;
+        if (correct) st.correct++;
+        const wrap = document.getElementById('qbtns-' + cid);
+        wrap.classList.add('locked');
+        const opts = wrap.querySelectorAll('.opt');
+        opts[st.current.which].classList.add('correct');
+        if (!correct) el.classList.add('wrong');
+        const fb = document.getElementById('fb-' + cid);
+        const heard = st.current.which === 0 ? st.current.wordA : st.current.wordB;
+        if (correct) {
+          fb.textContent = '✓ Верно — это было «' + heard + '».';
+          fb.className = 'feedback ok';
+        } else {
+          fb.textContent = '✗ Нет, прозвучало «' + heard + '». Нажми ↻ и послушай ещё раз.';
+          fb.className = 'feedback no';
+        }
+        document.getElementById('score-' + cid).innerHTML = 'Счёт: <b>' + st.correct + '</b> / ' + st.total;
+      }
 
-/* ---- controls ---- */
-document.getElementById('speedSeg').addEventListener('click', e=>{
-  const b=e.target.closest('[data-slow]'); if(!b) return;
-  slow=b.dataset.slow==='1';
-  document.querySelectorAll('#speedSeg button').forEach(x=>x.classList.toggle('on',x===b));
-});
+      /* ---- controls ---- */
+      document.getElementById('speedSeg').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-slow]');
+        if (!b) return;
+        slow = b.dataset.slow === '1';
+        document.querySelectorAll('#speedSeg button').forEach((x) => x.classList.toggle('on', x === b));
+      });
 
-/* ---------------- 44-sound inventory ---------------- */
-const MONO=[
-  {ipa:'iː', w:'see',   disp:'s<em>ee</em>'},
-  {ipa:'ɪ',  w:'ship',  disp:'sh<em>i</em>p'},
-  {ipa:'ʊ',  w:'book',  disp:'b<em>oo</em>k'},
-  {ipa:'uː', w:'boot',  disp:'b<em>oo</em>t'},
-  {ipa:'e',  w:'bed',   disp:'b<em>e</em>d'},
-  {ipa:'ə',  w:'about', disp:'<em>a</em>bout', note:'schwa — самый частый звук, всегда безударный'},
-  {ipa:'ɜː', w:'bird',  disp:'b<em>ir</em>d',  note:'в US — с r-окраской /ɝ/'},
-  {ipa:'ɔː', w:'saw',   disp:'s<em>aw</em>'},
-  {ipa:'æ',  w:'cat',   disp:'c<em>a</em>t'},
-  {ipa:'ʌ',  w:'cup',   disp:'c<em>u</em>p'},
-  {ipa:'ɑː', w:'car',   disp:'c<em>ar</em>',   note:'в US звучит r на конце'},
-  {ipa:'ɒ',  w:'hot',   disp:'h<em>o</em>t',   note:'в US сливается с /ɑː/'}
-];
-const DIPH=[
-  {ipa:'eɪ', w:'day',  disp:'d<em>ay</em>'},
-  {ipa:'aɪ', w:'my',   disp:'m<em>y</em>'},
-  {ipa:'ɔɪ', w:'boy',  disp:'b<em>oy</em>'},
-  {ipa:'aʊ', w:'now',  disp:'n<em>ow</em>'},
-  {ipa:'əʊ', w:'go',   disp:'g<em>o</em>',   note:'в US — /oʊ/, губы круглее'},
-  {ipa:'ɪə', w:'here', disp:'h<em>ere</em>', note:'RP; в US — /ɪr/'},
-  {ipa:'eə', w:'hair', disp:'h<em>air</em>', note:'RP; в US — /er/'},
-  {ipa:'ʊə', w:'tour', disp:'t<em>our</em>', note:'редкий, часто → /ɔː/'}
-];
-const CONS=[
-  {manner:'Взрывные', items:[
-    {ipa:'p', w:'pen', disp:'<em>p</em>en'},
-    {ipa:'b', w:'bad', disp:'<em>b</em>ad'},
-    {ipa:'t', w:'tea', disp:'<em>t</em>ea'},
-    {ipa:'d', w:'dog', disp:'<em>d</em>og'},
-    {ipa:'k', w:'key', disp:'<em>k</em>ey'},
-    {ipa:'ɡ', w:'go',  disp:'<em>g</em>o'}
-  ]},
-  {manner:'Аффрикаты', items:[
-    {ipa:'tʃ', w:'church', disp:'<em>ch</em>urch'},
-    {ipa:'dʒ', w:'judge',  disp:'<em>j</em>udge'}
-  ]},
-  {manner:'Фрикативные', items:[
-    {ipa:'f', w:'fish', disp:'<em>f</em>ish'},
-    {ipa:'v', w:'van',  disp:'<em>v</em>an'},
-    {ipa:'θ', w:'think', disp:'<em>th</em>ink', note:'глухой, без голоса'},
-    {ipa:'ð', w:'this',  disp:'<em>th</em>is',  note:'звонкий, с голосом'},
-    {ipa:'s', w:'sun',  disp:'<em>s</em>un'},
-    {ipa:'z', w:'zoo',  disp:'<em>z</em>oo'},
-    {ipa:'ʃ', w:'she',  disp:'<em>sh</em>e'},
-    {ipa:'ʒ', w:'measure', disp:'mea<em>s</em>ure', note:'как «ж»: vision, pleasure'},
-    {ipa:'h', w:'hat',  disp:'<em>h</em>at'}
-  ]},
-  {manner:'Носовые', items:[
-    {ipa:'m', w:'man', disp:'<em>m</em>an'},
-    {ipa:'n', w:'no',  disp:'<em>n</em>o'},
-    {ipa:'ŋ', w:'sing', disp:'si<em>ng</em>', note:'один звук, без /g/ на конце'}
-  ]},
-  {manner:'Аппроксиманты', items:[
-    {ipa:'l', w:'leg', disp:'<em>l</em>eg'},
-    {ipa:'r', w:'red', disp:'<em>r</em>ed'},
-    {ipa:'w', w:'wet', disp:'<em>w</em>et'},
-    {ipa:'j', w:'yes', disp:'<em>y</em>es', note:'согласный «й», не гласный'}
-  ]}
-];
-
-function soundCard(s, cat){
-  return `<div class="sound" data-cat="${cat}" data-word="${s.w}" title="${s.w}">
+      /* ---------------- 44-sound inventory ---------------- */
+      const MONO = [
+        { ipa: 'iː', w: 'see', tr: '/siː/', disp: 's<em>ee</em>' },
+        { ipa: 'ɪ', w: 'ship', tr: '/ʃɪp/', disp: 'sh<em>i</em>p' },
+        { ipa: 'ʊ', w: 'book', tr: '/bʊk/', disp: 'b<em>oo</em>k' },
+        { ipa: 'uː', w: 'boot', tr: '/buːt/', disp: 'b<em>oo</em>t' },
+        { ipa: 'e', w: 'bed', tr: '/bed/', disp: 'b<em>e</em>d' },
+        { ipa: 'ə', w: 'about', tr: '/əˈbaʊt/', disp: '<em>a</em>bout' },
+        { ipa: 'ɜː', w: 'bird', tr: '/bɜːd/', disp: 'b<em>ir</em>d' },
+        { ipa: 'ɔː', w: 'saw', tr: '/sɔː/', disp: 's<em>aw</em>' },
+        { ipa: 'æ', w: 'cat', tr: '/kæt/', disp: 'c<em>a</em>t' },
+        { ipa: 'ʌ', w: 'cup', tr: '/kʌp/', disp: 'c<em>u</em>p' },
+        { ipa: 'ɑː', w: 'car', tr: '/kɑː/', disp: 'c<em>ar</em>' },
+        { ipa: 'ɒ', w: 'hot', tr: '/hɒt/', disp: 'h<em>o</em>t' },
+      ];
+      const DIPH = [
+        { ipa: 'eɪ', w: 'day', tr: '/deɪ/', disp: 'd<em>ay</em>' },
+        { ipa: 'aɪ', w: 'my', tr: '/maɪ/', disp: 'm<em>y</em>' },
+        { ipa: 'ɔɪ', w: 'boy', tr: '/bɔɪ/', disp: 'b<em>oy</em>' },
+        { ipa: 'aʊ', w: 'now', tr: '/naʊ/', disp: 'n<em>ow</em>' },
+        { ipa: 'əʊ', w: 'go', tr: '/ɡəʊ/', disp: 'g<em>o</em>' },
+        { ipa: 'ɪə', w: 'here', tr: '/hɪə/', disp: 'h<em>ere</em>' },
+        { ipa: 'eə', w: 'hair', tr: '/heə/', disp: 'h<em>air</em>' },
+        { ipa: 'ʊə', w: 'tour', tr: '/tʊə/', disp: 't<em>our</em>' },
+      ];
+      const CONS = [
+        {
+          manner: 'Взрывные',
+          items: [
+            { ipa: 'p', w: 'pen', tr: '/pen/', disp: '<em>p</em>en' },
+            { ipa: 'b', w: 'bad', tr: '/bæd/', disp: '<em>b</em>ad' },
+            { ipa: 't', w: 'tea', tr: '/tiː/', disp: '<em>t</em>ea' },
+            { ipa: 'd', w: 'dog', tr: '/dɒɡ/', disp: '<em>d</em>og' },
+            { ipa: 'k', w: 'key', tr: '/kiː/', disp: '<em>k</em>ey' },
+            { ipa: 'ɡ', w: 'go', tr: '/ɡəʊ/', disp: '<em>g</em>o' },
+          ],
+        },
+        {
+          manner: 'Аффрикаты',
+          items: [
+            { ipa: 'tʃ', w: 'church', tr: '/tʃɜːtʃ/', disp: '<em>ch</em>urch' },
+            { ipa: 'dʒ', w: 'judge', tr: '/dʒʌdʒ/', disp: '<em>j</em>udge' },
+          ],
+        },
+        {
+          manner: 'Фрикативные',
+          items: [
+            { ipa: 'f', w: 'fish', tr: '/fɪʃ/', disp: '<em>f</em>ish' },
+            { ipa: 'v', w: 'van', tr: '/væn/', disp: '<em>v</em>an' },
+            { ipa: 'θ', w: 'think', tr: '/θɪŋk/', disp: '<em>th</em>ink' },
+            { ipa: 'ð', w: 'this', tr: '/ðɪs/', disp: '<em>th</em>is' },
+            { ipa: 's', w: 'sun', tr: '/sʌn/', disp: '<em>s</em>un' },
+            { ipa: 'z', w: 'zoo', tr: '/zuː/', disp: '<em>z</em>oo' },
+            { ipa: 'ʃ', w: 'she', tr: '/ʃiː/', disp: '<em>sh</em>e' },
+            { ipa: 'ʒ', w: 'measure', tr: '/ˈmeʒə/', disp: 'mea<em>s</em>ure' },
+            { ipa: 'h', w: 'hat', tr: '/hæt/', disp: '<em>h</em>at' },
+          ],
+        },
+        {
+          manner: 'Носовые',
+          items: [
+            { ipa: 'm', w: 'man', tr: '/mæn/', disp: '<em>m</em>an' },
+            { ipa: 'n', w: 'no', tr: '/nəʊ/', disp: '<em>n</em>o' },
+            { ipa: 'ŋ', w: 'sing', tr: '/sɪŋ/', disp: 'si<em>ng</em>' },
+          ],
+        },
+        {
+          manner: 'Аппроксиманты',
+          items: [
+            { ipa: 'l', w: 'leg', tr: '/leɡ/', disp: '<em>l</em>eg' },
+            { ipa: 'r', w: 'red', tr: '/red/', disp: '<em>r</em>ed' },
+            { ipa: 'w', w: 'wet', tr: '/wet/', disp: '<em>w</em>et' },
+            { ipa: 'j', w: 'yes', tr: '/jes/', disp: '<em>y</em>es' },
+          ],
+        },
+      ];
+      function soundCard(s, cat) {
+        return `<div class="sound" data-cat="${cat}" data-word="${s.w}" title="${s.w}">
     <span class="sym">${s.ipa}</span>
     <span class="ex">${s.disp}</span>
+    <span class="tr">${s.tr}</span>
   </div>`;
-}
-function buildInventory(){
-  const root=document.getElementById('inventoryBody');
-  let html='';
-  html+=`<div class="inv-group">
+      }
+      function buildInventory() {
+        const root = document.getElementById('inventoryBody');
+        let html = '';
+        html += `<div class="inv-group">
     <h2>Гласные — монофтонги <span class="gcount">12</span></h2>
     <p class="gdesc">Одиночные гласные. Знак ː = долгий звук; важны также длина и положение языка.</p>
-    <div class="inv-grid">${MONO.map(s=>soundCard(s,'mono')).join('')}</div></div>`;
-  html+=`<div class="inv-group">
+    <div class="inv-grid">${MONO.map((s) => soundCard(s, 'mono')).join('')}</div></div>`;
+        html += `<div class="inv-group">
     <h2>Гласные — дифтонги <span class="gcount">8</span></h2>
     <p class="gdesc">Скольжение от одного гласного к другому внутри одного слога.</p>
-    <div class="inv-grid">${DIPH.map(s=>soundCard(s,'diph')).join('')}</div></div>`;
-  let cons='';
-  CONS.forEach(g=>{ cons+=`<div class="manner">${g.manner}</div><div class="inv-grid">${g.items.map(s=>soundCard(s,'cons')).join('')}</div>`; });
-  html+=`<div class="inv-group">
+    <div class="inv-grid">${DIPH.map((s) => soundCard(s, 'diph')).join('')}</div></div>`;
+        let cons = '';
+        CONS.forEach((g) => {
+          cons += `<div class="manner">${g.manner}</div><div class="inv-grid">${g.items.map((s) => soundCard(s, 'cons')).join('')}</div>`;
+        });
+        html += `<div class="inv-group">
     <h2>Согласные <span class="gcount">24</span></h2>
     <p class="gdesc">Сгруппированы по способу образования.</p>${cons}</div>`;
-  root.innerHTML=html;
-}
-buildInventory();
+        root.innerHTML = html;
+      }
+      buildInventory();
 
-document.getElementById('inventoryBody').addEventListener('click', e=>{
-  const s=e.target.closest('.sound[data-word]');
-  if(s) speak(s.dataset.word, s);
-});
+      document.getElementById('inventoryBody').addEventListener('click', (e) => {
+        const s = e.target.closest('.sound[data-word]');
+        if (s) speak(s.dataset.word, s);
+      });
 
-/* ---------------- view switching ---------------- */
-function showView(v){
-  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('show', x.id==='view-'+v));
-  document.querySelectorAll('#viewseg button').forEach(b=>b.classList.toggle('on', b.dataset.view===v));
-  if(hasTTS) speechSynthesis.cancel();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-document.getElementById('viewseg').addEventListener('click', e=>{
-  const b=e.target.closest('[data-view]'); if(b) showView(b.dataset.view);
-});
-</script>
-</body>
+      /* ---------------- view switching ---------------- */
+      function showView(v) {
+        document.querySelectorAll('.view').forEach((x) => x.classList.toggle('show', x.id === 'view-' + v));
+        document.querySelectorAll('#viewseg button').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
+        if (hasTTS) speechSynthesis.cancel();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      document.getElementById('viewseg').addEventListener('click', (e) => {
+        const b = e.target.closest('[data-view]');
+        if (b) showView(b.dataset.view);
+      });
+    </script>
+  </body>
 </html>
